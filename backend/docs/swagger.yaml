@@ -33,7 +33,21 @@ info:
   title: FS Calculator API
   version: "1.0"
 paths:
-  /api/v1/add:
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - Health
+  /v1/operations/add:
     post:
       consumes:
       - application/json
@@ -56,7 +70,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Add two numbers
-  /api/v1/divide:
+      tags:
+      - Operations
+  /v1/operations/divide:
     post:
       consumes:
       - application/json
@@ -79,19 +95,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Divide two numbers
-  /api/v1/health:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Health check
-  /api/v1/multiply:
+      tags:
+      - Operations
+  /v1/operations/multiply:
     post:
       consumes:
       - application/json
@@ -114,7 +120,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Multiply two numbers
-  /api/v1/percentage:
+      tags:
+      - Operations
+  /v1/operations/percentage:
     post:
       consumes:
       - application/json
@@ -137,7 +145,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Calculate percentage
-  /api/v1/power:
+      tags:
+      - Operations
+  /v1/operations/power:
     post:
       consumes:
       - application/json
@@ -160,7 +170,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Raise a number to a power
-  /api/v1/sqrt:
+      tags:
+      - Operations
+  /v1/operations/sqrt:
     post:
       consumes:
       - application/json
@@ -183,7 +195,9 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Calculate a square root
-  /api/v1/subtract:
+      tags:
+      - Operations
+  /v1/operations/subtract:
     post:
       consumes:
       - application/json
@@ -206,4 +220,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Subtract two numbers
+      tags:
+      - Operations
 swagger: "2.0"

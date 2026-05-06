@@ -7,13 +7,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSetupRouterOperations(t *testing.T) {
-	engine := SetupRouter(service.NewCalculatorService())
+	engine := buildTestRouter()
 
 	testCases := []struct {
 		name           string
@@ -26,14 +27,14 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "health",
 			method:         http.MethodGet,
-			path:           "/api/v1/health",
+			path:           "/health",
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"status":"ok"}`,
 		},
 		{
 			name:           "add",
 			method:         http.MethodPost,
-			path:           "/api/v1/add",
+			path:           "/v1/operations/add",
 			body:           `{"operand_a":5,"operand_b":7}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":12}`,
@@ -41,7 +42,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "subtract",
 			method:         http.MethodPost,
-			path:           "/api/v1/subtract",
+			path:           "/v1/operations/subtract",
 			body:           `{"operand_a":10,"operand_b":3}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":7}`,
@@ -49,7 +50,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "multiply",
 			method:         http.MethodPost,
-			path:           "/api/v1/multiply",
+			path:           "/v1/operations/multiply",
 			body:           `{"operand_a":4,"operand_b":2.5}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":10}`,
@@ -57,7 +58,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "divide",
 			method:         http.MethodPost,
-			path:           "/api/v1/divide",
+			path:           "/v1/operations/divide",
 			body:           `{"operand_a":10,"operand_b":4}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":2.5}`,
@@ -65,7 +66,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "power",
 			method:         http.MethodPost,
-			path:           "/api/v1/power",
+			path:           "/v1/operations/power",
 			body:           `{"operand_a":2,"operand_b":3}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":8}`,
@@ -73,7 +74,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "sqrt",
 			method:         http.MethodPost,
-			path:           "/api/v1/sqrt",
+			path:           "/v1/operations/sqrt",
 			body:           `{"operand":25}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":5}`,
@@ -81,7 +82,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "percentage",
 			method:         http.MethodPost,
-			path:           "/api/v1/percentage",
+			path:           "/v1/operations/percentage",
 			body:           `{"operand":25}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":0.25}`,
@@ -89,7 +90,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "division by zero",
 			method:         http.MethodPost,
-			path:           "/api/v1/divide",
+			path:           "/v1/operations/divide",
 			body:           `{"operand_a":10,"operand_b":0}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   `{"error":"division by zero"}`,
@@ -97,7 +98,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "sqrt negative",
 			method:         http.MethodPost,
-			path:           "/api/v1/sqrt",
+			path:           "/v1/operations/sqrt",
 			body:           `{"operand":-4}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   `{"error":"square root of negative number"}`,
@@ -105,7 +106,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "invalid body",
 			method:         http.MethodPost,
-			path:           "/api/v1/add",
+			path:           "/v1/operations/add",
 			body:           `{"operand_a":`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   `{"error":"unexpected EOF"}`,
@@ -113,7 +114,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "missing fields",
 			method:         http.MethodPost,
-			path:           "/api/v1/add",
+			path:           "/v1/operations/add",
 			body:           `{"operand_a":0}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   `{"error":"operand_b is required"}`,
@@ -121,7 +122,7 @@ func TestSetupRouterOperations(t *testing.T) {
 		{
 			name:           "zero operands allowed",
 			method:         http.MethodPost,
-			path:           "/api/v1/add",
+			path:           "/v1/operations/add",
 			body:           `{"operand_a":0,"operand_b":0}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"result":0}`,
@@ -153,9 +154,9 @@ func TestSetupRouterOperations(t *testing.T) {
 }
 
 func TestRouterCorsHeaders(t *testing.T) {
-	engine := SetupRouter(service.NewCalculatorService())
+	engine := buildTestRouter()
 
-	req := httptest.NewRequest(http.MethodOptions, "/api/v1/add", nil)
+	req := httptest.NewRequest(http.MethodOptions, "/v1/operations/add", nil)
 	req.Header.Set("Origin", "http://localhost:3000")
 	req.Header.Set("Access-Control-Request-Method", http.MethodPost)
 
@@ -166,9 +167,9 @@ func TestRouterCorsHeaders(t *testing.T) {
 }
 
 func TestHealthResponseShape(t *testing.T) {
-	engine := SetupRouter(service.NewCalculatorService())
+	engine := buildTestRouter()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/health", nil)
+	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	recorder := httptest.NewRecorder()
 
 	engine.ServeHTTP(recorder, req)
@@ -179,6 +180,60 @@ func TestHealthResponseShape(t *testing.T) {
 	assert.Equal(t, "ok", response["status"])
 }
 
+func TestSwaggerRouteRegistered(t *testing.T) {
+	engine := buildTestRouter()
+
+	req := httptest.NewRequest(http.MethodGet, "/docs/index.html", nil)
+	recorder := httptest.NewRecorder()
+
+	engine.ServeHTTP(recorder, req)
+
+	assert.NotEqual(t, http.StatusNotFound, recorder.Code)
+}
+
+func TestDocsRootRedirectsToIndex(t *testing.T) {
+	engine := buildTestRouter()
+
+	testCases := []string{"/docs", "/docs/"}
+
+	for _, path := range testCases {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		recorder := httptest.NewRecorder()
+
+		engine.ServeHTTP(recorder, req)
+
+		assert.Equal(t, http.StatusMovedPermanently, recorder.Code)
+		assert.Equal(t, "/docs/index.html", recorder.Header().Get("Location"))
+	}
+}
+
+func TestUnknownRouteReturnsJsonNotFound(t *testing.T) {
+	engine := buildTestRouter()
+
+	req := httptest.NewRequest(http.MethodGet, "/missing", nil)
+	recorder := httptest.NewRecorder()
+
+	engine.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusNotFound, recorder.Code)
+	assert.JSONEq(t, `{"error":"not found"}`, recorder.Body.String())
+}
+
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+func buildTestRouter() *gin.Engine {
+	svc := service.NewCalculatorService()
+	calculatorController := controller.NewCalculatorController(svc)
+	healthController := controller.NewHealthController()
+	swaggerController := controller.NewSwaggerController()
+
+	return SetupRouter(Config{
+		AllowedOrigins: []string{"http://localhost:3000"},
+	}, Dependencies{
+		CalculatorController: calculatorController,
+		HealthController:     healthController,
+		SwaggerController:    swaggerController,
+	})
 }

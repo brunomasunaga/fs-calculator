@@ -2,11 +2,10 @@ package main
 
 import (
 	"log"
-	"os"
 
 	_ "github.com/brunomasunaga/fs-calculator/backend/docs"
-	"github.com/brunomasunaga/fs-calculator/backend/internal/router"
-	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
+	"github.com/brunomasunaga/fs-calculator/backend/internal/app"
+	"github.com/brunomasunaga/fs-calculator/backend/internal/config"
 )
 
 // @title FS Calculator API
@@ -14,15 +13,10 @@ import (
 // @description REST API for arithmetic and advanced calculator operations.
 // @BasePath /
 func main() {
-	svc := service.NewCalculatorService()
-	engine := router.SetupRouter(svc)
+	cfg := config.Load()
+	container := app.NewContainer(cfg)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	if err := engine.Run(":" + port); err != nil {
+	if err := container.Router.Run(":" + cfg.Port); err != nil {
 		log.Fatal(err)
 	}
 }

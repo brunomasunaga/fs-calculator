@@ -1,0 +1,121 @@
+import { AxiosError } from 'axios'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import client from '@/api/client'
+import {
+  add,
+  calculate,
+  divide,
+  multiply,
+  percentage,
+  power,
+  sqrt,
+  subtract,
+} from '@/api/calculator'
+
+vi.mock('@/api/client', () => ({
+  default: {
+    post: vi.fn(),
+  },
+}))
+
+const mockedClient = vi.mocked(client)
+
+describe('calculator api', () => {
+  beforeEach(() => {
+    mockedClient.post.mockReset()
+  })
+
+  it('posts binary operations to the expected endpoints', async () => {
+    mockedClient.post
+      .mockResolvedValueOnce({ data: { result: 3 } })
+      .mockResolvedValueOnce({ data: { result: 1 } })
+      .mockResolvedValueOnce({ data: { result: 8 } })
+      .mockResolvedValueOnce({ data: { result: 2 } })
+      .mockResolvedValueOnce({ data: { result: 9 } })
+
+    await expect(add(1, 2)).resolves.toBe(3)
+    await expect(subtract(3, 2)).resolves.toBe(1)
+    await expect(multiply(4, 2)).resolves.toBe(8)
+    await expect(divide(8, 4)).resolves.toBe(2)
+    await expect(power(3, 2)).resolves.toBe(9)
+
+    expect(mockedClient.post).toHaveBeenNthCalledWith(1, '/v1/operations/add', {
+      operand_a: 1,
+      operand_b: 2,
+    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(2, '/v1/operations/subtract', {
+      operand_a: 3,
+      operand_b: 2,
+    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(3, '/v1/operations/multiply', {
+      operand_a: 4,
+      operand_b: 2,
+    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(4, '/v1/operations/divide', {
+      operand_a: 8,
+      operand_b: 4,
+    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(5, '/v1/operations/power', {
+      operand_a: 3,
+      operand_b: 2,
+    })
+  })
+
+  it('posts unary operations to the expected endpoints', async () => {
+    mockedClient.post
+      .mockResolvedValueOnce({ data: { result: 5 } })
+      .mockResolvedValueOnce({ data: { result: 0.25 } })
+
+    await expect(sqrt(25)).resolves.toBe(5)
+    await expect(percentage(25)).resolves.toBe(0.25)
+
+    expect(mockedClient.post).toHaveBeenNthCalledWith(1, '/v1/operations/sqrt', {
+      operand: 25,
+    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(2, '/v1/operations/percentage', {
+      operand: 25,
+    })
+  })
+
+  it('routes calculate to the correct operation', async () => {
+    mockedClient.post
+      .mockResolvedValueOnce({ data: { result: 3 } })
+      .mockResolvedValueOnce({ data: { result: 2 } })
+      .mockResolvedValueOnce({ data: { result: 6 } })
+      .mockResolvedValueOnce({ data: { result: 2 } })
+      .mockResolvedValueOnce({ data: { result: 8 } })
+      .mockResolvedValueOnce({ data: { result: 4 } })
+      .mockResolvedValueOnce({ data: { result: 0.5 } })
+
+    await expect(calculate('add', 1, 2)).resolves.toBe(3)
+    await expect(calculate('subtract', 5, 3)).resolves.toBe(2)
+    await expect(calculate('multiply', 2, 3)).resolves.toBe(6)
+    await expect(calculate('divide', 8, 4)).resolves.toBe(2)
+    await expect(calculate('power', 2, 3)).resolves.toBe(8)
+    await expect(calculate('sqrt', 16)).resolves.toBe(4)
+    await expect(calculate('percentage', 50)).resolves.toBe(0.5)
+  })
+
+  it('normalizes axios api errors', async () => {
+    mockedClient.post.mockRejectedValueOnce(
+      new AxiosError('Request failed', undefined, undefined, undefined, {
+        data: {
+          error: 'division by zero',
+        },
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: {} as never,
+      }),
+    )
+
+    await expect(divide(10, 0)).rejects.toThrow('division by zero')
+  })
+
+  it('preserves generic errors', async () => {
+    mockedClient.post.mockRejectedValueOnce(new Error('network down'))
+
+    await expect(add(1, 2)).rejects.toThrow('network down')
+  })
+})

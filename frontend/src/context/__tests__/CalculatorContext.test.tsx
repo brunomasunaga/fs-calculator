@@ -88,7 +88,7 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(mockedClient.post).toHaveBeenCalledWith('/api/v1/add', {
+      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/add', {
         operand_a: 1,
         operand_b: 2,
       })
@@ -113,4 +113,3 @@ describe('CalculatorContext', () => {
     expect(screen.getByTestId('error')).toHaveTextContent('null')
   })
 })
-

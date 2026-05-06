@@ -19,13 +19,14 @@ func NewCalculatorController(svc service.CalculatorService) *CalculatorControlle
 }
 
 // Add calculates the sum of two operands.
+// @Tags Operations
 // @Summary Add two numbers
 // @Accept json
 // @Produce json
 // @Param request body dto.BinaryOperationRequest true "Operands"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/add [post]
+// @Router /v1/operations/add [post]
 func (cc *CalculatorController) Add(c *gin.Context) {
 	req, ok := bindBinaryRequest(c)
 	if !ok {
@@ -36,13 +37,14 @@ func (cc *CalculatorController) Add(c *gin.Context) {
 }
 
 // Subtract calculates the difference between two operands.
+// @Tags Operations
 // @Summary Subtract two numbers
 // @Accept json
 // @Produce json
 // @Param request body dto.BinaryOperationRequest true "Operands"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/subtract [post]
+// @Router /v1/operations/subtract [post]
 func (cc *CalculatorController) Subtract(c *gin.Context) {
 	req, ok := bindBinaryRequest(c)
 	if !ok {
@@ -53,13 +55,14 @@ func (cc *CalculatorController) Subtract(c *gin.Context) {
 }
 
 // Multiply calculates the product of two operands.
+// @Tags Operations
 // @Summary Multiply two numbers
 // @Accept json
 // @Produce json
 // @Param request body dto.BinaryOperationRequest true "Operands"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/multiply [post]
+// @Router /v1/operations/multiply [post]
 func (cc *CalculatorController) Multiply(c *gin.Context) {
 	req, ok := bindBinaryRequest(c)
 	if !ok {
@@ -70,13 +73,14 @@ func (cc *CalculatorController) Multiply(c *gin.Context) {
 }
 
 // Divide calculates the quotient of two operands.
+// @Tags Operations
 // @Summary Divide two numbers
 // @Accept json
 // @Produce json
 // @Param request body dto.BinaryOperationRequest true "Operands"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/divide [post]
+// @Router /v1/operations/divide [post]
 func (cc *CalculatorController) Divide(c *gin.Context) {
 	req, ok := bindBinaryRequest(c)
 	if !ok {
@@ -93,13 +97,14 @@ func (cc *CalculatorController) Divide(c *gin.Context) {
 }
 
 // Power raises the first operand to the power of the second operand.
+// @Tags Operations
 // @Summary Raise a number to a power
 // @Accept json
 // @Produce json
 // @Param request body dto.BinaryOperationRequest true "Operands"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/power [post]
+// @Router /v1/operations/power [post]
 func (cc *CalculatorController) Power(c *gin.Context) {
 	req, ok := bindBinaryRequest(c)
 	if !ok {
@@ -110,13 +115,14 @@ func (cc *CalculatorController) Power(c *gin.Context) {
 }
 
 // Sqrt calculates the square root of a single operand.
+// @Tags Operations
 // @Summary Calculate a square root
 // @Accept json
 // @Produce json
 // @Param request body dto.UnaryOperationRequest true "Operand"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/sqrt [post]
+// @Router /v1/operations/sqrt [post]
 func (cc *CalculatorController) Sqrt(c *gin.Context) {
 	req, ok := bindUnaryRequest(c)
 	if !ok {
@@ -133,13 +139,14 @@ func (cc *CalculatorController) Sqrt(c *gin.Context) {
 }
 
 // Percentage converts an operand into its percentage value.
+// @Tags Operations
 // @Summary Calculate percentage
 // @Accept json
 // @Produce json
 // @Param request body dto.UnaryOperationRequest true "Operand"
 // @Success 200 {object} dto.CalculateResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Router /api/v1/percentage [post]
+// @Router /v1/operations/percentage [post]
 func (cc *CalculatorController) Percentage(c *gin.Context) {
 	req, ok := bindUnaryRequest(c)
 	if !ok {

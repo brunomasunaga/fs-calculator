@@ -15,13 +15,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/add": {
+        "/health": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/operations/add": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Add two numbers",
                 "parameters": [
@@ -51,13 +76,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/divide": {
+        "/v1/operations/divide": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Divide two numbers",
                 "parameters": [
@@ -87,32 +115,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/health": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Health check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/multiply": {
+        "/v1/operations/multiply": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Multiply two numbers",
                 "parameters": [
@@ -142,13 +154,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/percentage": {
+        "/v1/operations/percentage": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Calculate percentage",
                 "parameters": [
@@ -178,13 +193,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/power": {
+        "/v1/operations/power": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Raise a number to a power",
                 "parameters": [
@@ -214,13 +232,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/sqrt": {
+        "/v1/operations/sqrt": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Calculate a square root",
                 "parameters": [
@@ -250,13 +271,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/subtract": {
+        "/v1/operations/subtract": {
             "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Operations"
                 ],
                 "summary": "Subtract two numbers",
                 "parameters": [

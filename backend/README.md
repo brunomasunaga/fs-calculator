@@ -23,6 +23,12 @@ make run
 
 The server listens on `:8080` by default. Override it with `PORT`.
 
+CORS allowed origins are configured with `ALLOWED_ORIGINS` as a comma-separated list. If unset, the backend defaults to:
+
+```text
+http://localhost:3000,http://localhost:5173
+```
+
 ## Hot reload in Docker
 
 ```bash
@@ -60,7 +66,7 @@ That starts the default hot-reload stack through the root `docker-compose.yml`.
 Addition:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/add \
+curl -X POST http://localhost:8080/v1/operations/add \
   -H "Content-Type: application/json" \
   -d '{"operand_a":10.5,"operand_b":3.2}'
 ```
@@ -68,7 +74,7 @@ curl -X POST http://localhost:8080/api/v1/add \
 Subtraction:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/subtract \
+curl -X POST http://localhost:8080/v1/operations/subtract \
   -H "Content-Type: application/json" \
   -d '{"operand_a":10.5,"operand_b":3.2}'
 ```
@@ -76,7 +82,7 @@ curl -X POST http://localhost:8080/api/v1/subtract \
 Multiplication:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/multiply \
+curl -X POST http://localhost:8080/v1/operations/multiply \
   -H "Content-Type: application/json" \
   -d '{"operand_a":10.5,"operand_b":3.2}'
 ```
@@ -84,7 +90,7 @@ curl -X POST http://localhost:8080/api/v1/multiply \
 Division:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/divide \
+curl -X POST http://localhost:8080/v1/operations/divide \
   -H "Content-Type: application/json" \
   -d '{"operand_a":10.5,"operand_b":3.2}'
 ```
@@ -92,7 +98,7 @@ curl -X POST http://localhost:8080/api/v1/divide \
 Power:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/power \
+curl -X POST http://localhost:8080/v1/operations/power \
   -H "Content-Type: application/json" \
   -d '{"operand_a":2,"operand_b":3}'
 ```
@@ -100,7 +106,7 @@ curl -X POST http://localhost:8080/api/v1/power \
 Square root:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/sqrt \
+curl -X POST http://localhost:8080/v1/operations/sqrt \
   -H "Content-Type: application/json" \
   -d '{"operand":25}'
 ```
@@ -108,7 +114,7 @@ curl -X POST http://localhost:8080/api/v1/sqrt \
 Percentage:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/percentage \
+curl -X POST http://localhost:8080/v1/operations/percentage \
   -H "Content-Type: application/json" \
   -d '{"operand":25}'
 ```
@@ -116,5 +122,5 @@ curl -X POST http://localhost:8080/api/v1/percentage \
 Health check:
 
 ```bash
-curl http://localhost:8080/api/v1/health
+curl http://localhost:8080/health
 ```

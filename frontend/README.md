@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-The Vite dev server runs on `http://localhost:3000`. By default the app calls `/api/v1/...` and expects the Vite proxy to forward those requests. Set `VITE_API_URL` only when you want to bypass the proxy and hit a backend directly.
+The Vite dev server runs on `http://localhost:3000`. By default the app calls `/v1/operations/...` and expects the Vite proxy to forward those requests. `/health` and `/docs` are proxied too. Set `VITE_API_URL` only when you want to bypass the proxy and hit a backend directly.
 
 ## Docker
 
