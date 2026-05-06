@@ -1,100 +1,180 @@
-# FS Calculator
+# FS Calculator ![Go](https://img.shields.io/badge/go-1.24+-00ADD8?style=flat&logo=go&logoColor=white) ![React](https://img.shields.io/badge/react-19-61DAFB?style=flat&logo=react&logoColor=black) ![Vite](https://img.shields.io/badge/vite-8-646CFF?style=flat&logo=vite&logoColor=white) ![Docker](https://img.shields.io/badge/docker-dev%20stack-2496ED?style=flat&logo=docker&logoColor=white)
 
-Full-stack calculator application with a Go API and a React frontend.
+## ⚡ The solution
+> FS Calculator is a full-stack arithmetic application with a Go REST API, a React client, and a Docker-first development workflow with hot reload on both sides.
 
-## Quick start
+The repository is split into two applications:
+
+- **Backend**: a Gin-based API that exposes health, docs, and versioned calculator operation endpoints.
+- **Frontend**: a React + Vite single-page application that handles calculator state, user input, and API communication.
+
+Core stack:
+
+- **Backend**: Go, Gin, Swaggo, Air
+- **Frontend**: React, TypeScript, Vite, Vitest, Axios, Tailwind, SCSS
+- **Tooling**: Docker Compose for the default hot-reload workflow
+
+The codebase follows a pragmatic layered design:
+
+- **Presentation layer**:
+  - **Concern**: receives HTTP requests, validates payloads, and returns consistent responses.
+  - **Components**: Gin router, calculator controller, health controller, Swagger controller.
+
+- **Service layer**:
+  - **Concern**: applies calculator rules and returns domain-level errors without transport concerns.
+  - **Components**: `CalculatorService`.
+
+- **Client layer**:
+  - **Concern**: renders the calculator UI, manages interaction flow, and calls backend operations.
+  - **Components**: React pages, context state, API client helpers.
+
+#### 📁 Folder structure
+```text
+sezzle-calculator/              # root
+├── backend/
+│   ├── cmd/server/             # backend entrypoint
+│   ├── docs/                   # generated Swagger docs
+│   ├── internal/
+│   │   ├── app/                # composition root / dependency wiring
+│   │   ├── config/             # env-based config loading
+│   │   ├── controller/         # HTTP adapters
+│   │   │   └── calculator/     # calculator handlers and request/response contracts
+│   │   ├── router/             # route registration
+│   │   └── service/            # calculator business logic
+│   ├── Dockerfile              # backend dev image
+│   └── Makefile                # backend commands
+├── frontend/
+│   ├── public/                 # static assets
+│   ├── src/
+│   │   ├── api/                # HTTP client helpers and tests
+│   │   ├── components/         # shared UI primitives
+│   │   ├── context/            # calculator state management
+│   │   ├── pages/calculator/   # calculator screen and controls
+│   │   ├── styles/             # global styles
+│   │   └── test/               # frontend test setup
+│   ├── Dockerfile              # frontend dev image
+│   └── package.json            # frontend scripts and dependencies
+├── docker-compose.yml          # default hot-reload development stack
+└── README.md                   # repository guide
+```
+
+## 🎯 The approach
+
+1. Keep the API contract explicit with one endpoint per operation instead of a generic evaluator.
+2. Use manual dependency wiring in Go so construction stays visible and easy to extend.
+3. Keep HTTP contracts close to the calculator controller instead of sharing a generic DTO package.
+4. Use a Docker-first workflow so backend and frontend can run with the same entrypoint.
+5. Preserve fast iteration with `air` on the backend and Vite HMR on the frontend.
+6. Cover controller, service, routing, config, and integration paths with automated tests.
+
+## 🤔 Trade-offs and decisions
+
+1. **Versioned operation routes**: the API uses `/v1/operations/...` so future versions can evolve without breaking clients.
+2. **Separate operation endpoints**: this adds more handlers, but keeps Swagger contracts and validation straightforward.
+3. **Pragmatic layering over strict hexagonal design**: the project uses dependency injection and explicit wiring without adding extra port abstractions that would not pay off yet.
+4. **Docker as the default development flow**: this avoids local tool mismatch, at the cost of Vite polling for reliable file watching in mounted volumes.
+5. **No persistence layer**: the app is intentionally stateless, so introducing repositories or a database would only add noise.
+
+## 🔧 Potential improvements
+
+1. Add request logging and structured metrics for backend observability.
+2. Introduce frontend end-to-end tests against the running Docker stack.
+3. Expand calculator history or memory features if the UI grows beyond a single-screen flow.
+4. Add CI checks for lint, tests, Swagger generation, and coverage thresholds.
+5. If the backend gains more adapters, move toward consumer-owned ports for stricter dependency inversion.
+
+## 🪛 Setting up
+
+### 1. Install dependencies
+Make sure these are available on your machine:
+
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+Optional local tooling:
+
+- Go `1.25+` for running the backend outside Docker
+- Node.js `20+` and npm for running the frontend outside Docker
+- `golangci-lint` if you want to use the backend lint command locally
+
+### 2. Start the development stack
+
+From the repository root:
 
 ```bash
 docker compose up --build
 ```
 
-This is the default Docker workflow and it is hot-reload oriented:
+This is the default workflow. It starts:
 
-- backend runs through `air` and rebuilds/restarts on Go file changes
-- frontend runs the Vite dev server with polling enabled for Docker-mounted files
-- source code is bind-mounted into both containers
-- Go module/build caches and frontend `node_modules` stay in Docker volumes
+- the **backend** on `http://localhost:8080`
+- the **frontend** on `http://localhost:3000`
 
-After the containers start:
+The stack uses bind mounts plus Docker-managed caches:
 
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8080`
-- Docs: `http://localhost:8080/docs/index.html`
+- Go source changes trigger rebuild/restart through `air`
+- frontend changes trigger Vite hot reload
+- Go module cache, Go build cache, and `node_modules` stay in Docker volumes
 
-The backend CORS allowlist is configured through `ALLOWED_ORIGINS`. The default Docker setup uses:
+### 3. Environment variables
 
-```text
-http://localhost:3000,http://localhost:5173
-```
+The backend reads:
 
-## Architecture
+| Variable | Description |
+| :--- | :--- |
+| `PORT` | API port. Defaults to `8080` |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allowlist. Defaults to `http://localhost:3000,http://localhost:5173` |
 
-```text
-Frontend (React + Context + Axios)
-        |
-        v
-Backend API (Gin controllers)
-        |
-        v
-Calculator service layer
-```
+The frontend dev server uses:
 
-- The frontend owns presentation, user input, and state transitions.
-- The backend owns validation, operation handling, and HTTP responses.
-- The service layer stays transport-agnostic and returns domain errors.
-- There is no repository or database because the application is stateless.
+| Variable | Description |
+| :--- | :--- |
+| `VITE_PROXY_TARGET` | Backend target for Vite proxy. In Docker, it uses `http://backend:8080` |
+| `VITE_API_URL` | Optional frontend base URL override when you want the browser client to bypass the Vite proxy |
 
-## API examples
+## ▶️ Running the applications without Docker
 
-Addition:
+### Backend
+
+From `backend/`:
 
 ```bash
-curl -X POST http://localhost:8080/v1/operations/add \
-  -H "Content-Type: application/json" \
-  -d '{"operand_a":10.5,"operand_b":3.2}'
+make run
 ```
 
-Subtraction:
+### Frontend
+
+From `frontend/`:
 
 ```bash
-curl -X POST http://localhost:8080/v1/operations/subtract \
-  -H "Content-Type: application/json" \
-  -d '{"operand_a":10.5,"operand_b":3.2}'
+npm install
+npm run dev
 ```
 
-Multiplication:
+The frontend dev server runs on `http://localhost:3000`.
 
-```bash
-curl -X POST http://localhost:8080/v1/operations/multiply \
-  -H "Content-Type: application/json" \
-  -d '{"operand_a":10.5,"operand_b":3.2}'
-```
+By default, the UI calls `/v1/operations/...` and relies on the Vite proxy to forward requests to the backend. It also proxies `/health` and `/docs`.
 
-Division:
+`VITE_PROXY_TARGET` controls the proxy destination. In Docker it points to `http://backend:8080`.
 
-```bash
-curl -X POST http://localhost:8080/v1/operations/divide \
-  -H "Content-Type: application/json" \
-  -d '{"operand_a":10.5,"operand_b":3.2}'
-```
+`VITE_API_URL` can be set when you want the browser to call a backend directly instead of using the local proxy.
 
-Power:
+## 📃 Documentation
 
-```bash
-curl -X POST http://localhost:8080/v1/operations/power \
-  -H "Content-Type: application/json" \
-  -d '{"operand_a":2,"operand_b":3}'
-```
+Once the backend is running, the available endpoints include:
 
-Square root:
+- Health: `GET http://localhost:8080/health`
+- Swagger UI: `GET http://localhost:8080/docs`
+- Operations:
+  - `POST /v1/operations/add`
+  - `POST /v1/operations/subtract`
+  - `POST /v1/operations/multiply`
+  - `POST /v1/operations/divide`
+  - `POST /v1/operations/power`
+  - `POST /v1/operations/sqrt`
+  - `POST /v1/operations/percentage`
 
-```bash
-curl -X POST http://localhost:8080/v1/operations/sqrt \
-  -H "Content-Type: application/json" \
-  -d '{"operand":25}'
-```
-
-Percentage:
+Example:
 
 ```bash
 curl -X POST http://localhost:8080/v1/operations/percentage \
@@ -102,49 +182,60 @@ curl -X POST http://localhost:8080/v1/operations/percentage \
   -d '{"operand_a":50,"operand_b":90}'
 ```
 
-Health check:
+Response:
 
-```bash
-curl http://localhost:8080/health
+```json
+{
+  "result": 45
+}
 ```
 
-## Trade-offs and API design
+## 🧪 Running tests
 
-### One endpoint per operation
+### Backend
 
-Why this was chosen:
+From `backend/`:
 
-- Binary and unary operations have different request shapes, so separate endpoints keep the contract explicit.
-- Swagger stays self-describing because each route documents exactly one payload type.
-- Testing stays small and focused because handlers do not need a large `switch` over mixed operation types.
-- Adding a new operation is localized to one route, one handler, and one service method.
+```bash
+make test
+make coverage
+```
 
-Trade-offs:
+You can also run:
 
-- There are more routes and a bit more boilerplate than a single `/calculate` endpoint.
-- A generic expression evaluator would fit a different API shape better, but this project has a fixed operation set where explicit contracts are clearer.
+```bash
+go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8 run
+```
 
-### Why `POST` for operations
+Other useful backend commands:
 
-- The calculator sends structured request bodies.
-- Floating-point operands are cleaner in JSON than query strings.
-- The interface stays consistent across binary and unary operations.
+```bash
+make build
+make fmt
+make swagger
+```
 
-### Why REST
+### Frontend
 
-- The app is request/response driven.
-- There is no streaming, collaboration, or server push requirement.
-- WebSockets or RPC would add complexity without improving the user flow here.
+From `frontend/`:
 
-## Other decisions
+```bash
+npm test
+npm run test:coverage
+npm run lint
+```
 
-- Context API over Redux: one feature, one page, low shared-state complexity.
-- Axios over `fetch`: simpler error normalization and endpoint helpers.
-- ShadCN-style primitives: reusable button/card building blocks without locking the page layout into a generic template.
-- Docker bind mounts + cached volumes: fast feedback without reinstalling dependencies on every change.
+Other useful frontend commands:
 
-## Layout and design rationale
+```bash
+npm run build
+npm run test:watch
+npm run format
+```
 
-- The interface centers the calculator as the only task on screen, which keeps the interaction fast on desktop and mobile.
-- Warm neutrals with orange/teal accents make operation controls stand out without falling into the usual dark-calculator visual pattern.
-- The display uses a monospace treatment for readability, while the surrounding typography stays more expressive.
+## 🧩 Frontend design choices
+
+1. **Context API over Redux**: the app has a single focused calculator flow, so extra state tooling would add indirection without clear benefit.
+2. **Axios over fetch**: request helpers and error handling stay centralized and easier to evolve.
+3. **Tailwind plus SCSS**: layout utilities are fast to work with, while global tokens and theme styling stay in one place.
+4. **Small UI primitive layer**: button and card primitives keep calculator-specific components focused on behavior.
