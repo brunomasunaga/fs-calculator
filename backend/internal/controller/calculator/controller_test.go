@@ -36,11 +36,25 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 			expectedBody:   map[string]any{"result": 8.0},
 		},
 		{
+			name:           "subtract invalid json",
+			handler:        (*CalculatorController).Subtract,
+			body:           `{`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "unexpected EOF"},
+		},
+		{
 			name:           "multiply success",
 			handler:        (*CalculatorController).Multiply,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 20.0},
+		},
+		{
+			name:           "multiply missing operand b",
+			handler:        (*CalculatorController).Multiply,
+			body:           `{"operand_a":10}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "operand_b is required"},
 		},
 		{
 			name:           "power success",
@@ -50,6 +64,13 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 			expectedBody:   map[string]any{"result": 8.0},
 		},
 		{
+			name:           "power invalid operand type",
+			handler:        (*CalculatorController).Power,
+			body:           `{"operand_a":"bad","operand_b":3}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "json: cannot unmarshal string into Go struct field BinaryOperationRequest.operand_a of type float64"},
+		},
+		{
 			name:           "percentage success",
 			handler:        (*CalculatorController).Percentage,
 			body:           `{"operand_a":50,"operand_b":90}`,
@@ -57,11 +78,25 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 			expectedBody:   map[string]any{"result": 45.0},
 		},
 		{
+			name:           "percentage missing operand b",
+			handler:        (*CalculatorController).Percentage,
+			body:           `{"operand_a":50}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "operand_b is required"},
+		},
+		{
 			name:           "divide success",
 			handler:        (*CalculatorController).Divide,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 5.0},
+		},
+		{
+			name:           "divide invalid json",
+			handler:        (*CalculatorController).Divide,
+			body:           `{`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "unexpected EOF"},
 		},
 		{
 			name:           "divide service error",
@@ -145,8 +180,8 @@ func TestCalculatorControllerUnaryHandlers(t *testing.T) {
 			expectedBody:   map[string]any{"error": service.ErrNegativeSqrt.Error()},
 		},
 		{
-			name:           "invalid json",
-			handler:        (*CalculatorController).Percentage,
+			name:           "sqrt invalid json",
+			handler:        (*CalculatorController).Sqrt,
 			body:           `{`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "unexpected EOF"},
@@ -157,6 +192,13 @@ func TestCalculatorControllerUnaryHandlers(t *testing.T) {
 			body:           `{"operand":"bad"}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "json: cannot unmarshal string into Go struct field UnaryOperationRequest.operand of type float64"},
+		},
+		{
+			name:           "sqrt missing operand",
+			handler:        (*CalculatorController).Sqrt,
+			body:           `{}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]any{"error": "operand is required"},
 		},
 	}
 
