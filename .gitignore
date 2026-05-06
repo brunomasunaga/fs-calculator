@@ -1,1 +1,4 @@
 .DS_Store
+backend/bin/
+backend/coverage.html
+backend/coverage.out

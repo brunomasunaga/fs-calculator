@@ -52,10 +52,6 @@ func (m mockCalculatorService) Percentage(a float64) float64 {
 }
 
 func TestCalculatorControllerBinaryHandlers(t *testing.T) {
-	t.Parallel()
-
-	gin.SetMode(gin.TestMode)
-
 	testCases := []struct {
 		name           string
 		handler        func(*CalculatorController, *gin.Context)
@@ -155,8 +151,6 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
 			recorder := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(recorder)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tc.body))
@@ -177,10 +171,6 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 }
 
 func TestCalculatorControllerUnaryHandlers(t *testing.T) {
-	t.Parallel()
-
-	gin.SetMode(gin.TestMode)
-
 	testCases := []struct {
 		name           string
 		handler        func(*CalculatorController, *gin.Context)
@@ -250,8 +240,6 @@ func TestCalculatorControllerUnaryHandlers(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
 			recorder := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(recorder)
 			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tc.body))
@@ -272,8 +260,6 @@ func TestCalculatorControllerUnaryHandlers(t *testing.T) {
 }
 
 func TestWriteError(t *testing.T) {
-	t.Parallel()
-
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
 
@@ -281,4 +267,8 @@ func TestWriteError(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	assert.JSONEq(t, `{"error":"boom"}`, recorder.Body.String())
+}
+
+func init() {
+	gin.SetMode(gin.TestMode)
 }

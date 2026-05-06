@@ -8,12 +8,11 @@ import (
 	"testing"
 
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSetupRouterOperations(t *testing.T) {
-	t.Parallel()
-
 	engine := SetupRouter(service.NewCalculatorService())
 
 	testCases := []struct {
@@ -132,8 +131,6 @@ func TestSetupRouterOperations(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
 			var body *bytes.Buffer
 			if tc.body == "" {
 				body = bytes.NewBuffer(nil)
@@ -156,8 +153,6 @@ func TestSetupRouterOperations(t *testing.T) {
 }
 
 func TestRouterCorsHeaders(t *testing.T) {
-	t.Parallel()
-
 	engine := SetupRouter(service.NewCalculatorService())
 
 	req := httptest.NewRequest(http.MethodOptions, "/api/v1/add", nil)
@@ -171,8 +166,6 @@ func TestRouterCorsHeaders(t *testing.T) {
 }
 
 func TestHealthResponseShape(t *testing.T) {
-	t.Parallel()
-
 	engine := SetupRouter(service.NewCalculatorService())
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/health", nil)
@@ -184,4 +177,8 @@ func TestHealthResponseShape(t *testing.T) {
 	err := json.Unmarshal(recorder.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, "ok", response["status"])
+}
+
+func init() {
+	gin.SetMode(gin.TestMode)
 }
