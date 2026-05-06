@@ -76,3 +76,83 @@ select {
   text-transform: uppercase;
 }
 
+@keyframes calculator-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.05);
+  }
+}
+
+.calculator-stage {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+.calculator-shell {
+  animation: calculator-rise 420ms ease-out;
+}
+
+.calculator-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(10px);
+  opacity: 0.8;
+  animation: orb-drift 12s ease-in-out infinite;
+}
+
+.calculator-orb--primary {
+  top: 10%;
+  left: 6%;
+  width: 14rem;
+  height: 14rem;
+  background: radial-gradient(circle, rgba(240, 108, 43, 0.35), transparent 68%);
+}
+
+.calculator-orb--secondary {
+  right: 10%;
+  bottom: 12%;
+  width: 16rem;
+  height: 16rem;
+  background: radial-gradient(circle, rgba(15, 118, 110, 0.28), transparent 68%);
+  animation-delay: -6s;
+}
+
+@media (max-width: 640px) {
+  .calculator-stage {
+    padding: 1rem;
+  }
+
+  .calculator-orb--primary {
+    top: 3%;
+    left: -2rem;
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .calculator-orb--secondary {
+    right: -2rem;
+    bottom: 8%;
+    width: 12rem;
+    height: 12rem;
+  }
+}
