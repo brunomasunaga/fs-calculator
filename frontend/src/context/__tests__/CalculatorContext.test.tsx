@@ -33,9 +33,9 @@ function Harness() {
       <button onClick={() => context.inputDigit('1')}>digit-1</button>
       <button onClick={() => context.inputDigit('2')}>digit-2</button>
       <button onClick={() => context.inputOperation('+')}>add</button>
+      <button onClick={() => context.inputPercentage()}>percentage</button>
       <button onClick={() => void context.inputEquals()}>equals</button>
       <button onClick={() => context.inputClear()}>clear</button>
-      <button onClick={() => void context.inputPercentage()}>percentage</button>
     </div>
   )
 }
@@ -73,6 +73,17 @@ describe('CalculatorContext', () => {
     expect(screen.getByTestId('waiting')).toHaveTextContent('true')
   })
 
+  it('treats percentage as a binary operation', () => {
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('percentage'))
+
+    expect(screen.getByTestId('operand-a')).toHaveTextContent('1')
+    expect(screen.getByTestId('operation')).toHaveTextContent('percentage')
+    expect(screen.getByTestId('waiting')).toHaveTextContent('true')
+  })
+
   it('calls the API client when resolving equals', async () => {
     mockedClient.post.mockResolvedValueOnce({
       data: {
@@ -96,6 +107,34 @@ describe('CalculatorContext', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('display')).toHaveTextContent('42')
+    })
+  })
+
+  it('calls the API client for percentage as a binary operation', async () => {
+    mockedClient.post.mockResolvedValueOnce({
+      data: {
+        result: 45,
+      },
+    })
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('percentage'))
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+
+    await waitFor(() => {
+      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/percentage', {
+        operand_a: 12,
+        operand_b: 12,
+      })
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('display')).toHaveTextContent('45')
     })
   })
 

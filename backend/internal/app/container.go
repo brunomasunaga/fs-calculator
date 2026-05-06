@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/brunomasunaga/fs-calculator/backend/internal/config"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
+	calculatorcontroller "github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/router"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ type Services struct {
 }
 
 type Controllers struct {
-	Calculator *controller.CalculatorController
+	Calculator *calculatorcontroller.CalculatorController
 	Health     *controller.HealthController
 	Swagger    *controller.SwaggerController
 }
@@ -31,7 +32,7 @@ func NewContainer(cfg config.Config) *Container {
 	}
 
 	controllers := Controllers{
-		Calculator: controller.NewCalculatorController(services.Calculator),
+		Calculator: calculatorcontroller.NewCalculatorController(services.Calculator),
 		Health:     controller.NewHealthController(),
 		Swagger:    controller.NewSwaggerController(),
 	}

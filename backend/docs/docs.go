@@ -56,7 +56,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -64,13 +64,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -95,7 +95,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -103,13 +103,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -142,13 +142,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -168,12 +168,12 @@ const docTemplate = `{
                 "summary": "Calculate percentage",
                 "parameters": [
                     {
-                        "description": "Operand",
+                        "description": "Operands",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UnaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -181,13 +181,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -212,7 +212,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -220,13 +220,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -251,7 +251,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UnaryOperationRequest"
+                            "$ref": "#/definitions/calculator.UnaryOperationRequest"
                         }
                     }
                 ],
@@ -259,13 +259,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -290,7 +290,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -298,13 +298,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -312,7 +312,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.BinaryOperationRequest": {
+        "calculator.BinaryOperationRequest": {
             "type": "object",
             "properties": {
                 "operand_a": {
@@ -325,7 +325,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CalculateResponse": {
+        "calculator.CalculateResponse": {
             "type": "object",
             "properties": {
                 "result": {
@@ -334,7 +334,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ErrorResponse": {
+        "calculator.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -343,7 +343,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UnaryOperationRequest": {
+        "calculator.UnaryOperationRequest": {
             "type": "object",
             "properties": {
                 "operand": {

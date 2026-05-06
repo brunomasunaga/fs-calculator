@@ -47,9 +47,9 @@ func TestCalculatorServiceBinaryOperations(t *testing.T) {
 		{
 			name: "percentage",
 			operation: func() float64 {
-				return svc.Percentage(25)
+				return svc.Percentage(50, 90)
 			},
-			expected: 0.25,
+			expected: 45,
 		},
 	}
 

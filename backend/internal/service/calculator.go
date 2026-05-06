@@ -10,26 +10,26 @@ var (
 	ErrNegativeSqrt   = errors.New("square root of negative number")
 )
 
-type calculatorService struct{}
+type CalculatorService struct{}
 
-// NewCalculatorService creates a calculator service implementation.
+// NewCalculatorService creates a calculator service.
 func NewCalculatorService() CalculatorService {
-	return calculatorService{}
+	return CalculatorService{}
 }
 
-func (calculatorService) Add(a, b float64) float64 {
+func (CalculatorService) Add(a, b float64) float64 {
 	return a + b
 }
 
-func (calculatorService) Subtract(a, b float64) float64 {
+func (CalculatorService) Subtract(a, b float64) float64 {
 	return a - b
 }
 
-func (calculatorService) Multiply(a, b float64) float64 {
+func (CalculatorService) Multiply(a, b float64) float64 {
 	return a * b
 }
 
-func (calculatorService) Divide(a, b float64) (float64, error) {
+func (CalculatorService) Divide(a, b float64) (float64, error) {
 	if b == 0 {
 		return 0, ErrDivisionByZero
 	}
@@ -37,11 +37,11 @@ func (calculatorService) Divide(a, b float64) (float64, error) {
 	return a / b, nil
 }
 
-func (calculatorService) Power(a, b float64) float64 {
+func (CalculatorService) Power(a, b float64) float64 {
 	return math.Pow(a, b)
 }
 
-func (calculatorService) Sqrt(a float64) (float64, error) {
+func (CalculatorService) Sqrt(a float64) (float64, error) {
 	if a < 0 {
 		return 0, ErrNegativeSqrt
 	}
@@ -49,6 +49,6 @@ func (calculatorService) Sqrt(a float64) (float64, error) {
 	return math.Sqrt(a), nil
 }
 
-func (calculatorService) Percentage(a float64) float64 {
-	return a / 100
+func (CalculatorService) Percentage(a, b float64) float64 {
+	return (a / 100) * b
 }

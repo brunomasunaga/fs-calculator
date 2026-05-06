@@ -24,7 +24,7 @@ export function Keypad() {
       <OperationButton
         label="%"
         variant="special"
-        onClick={() => void inputPercentage()}
+        onClick={inputPercentage}
       />
       <OperationButton
         label="÷"
@@ -75,4 +75,3 @@ export function Keypad() {
     </section>
   )
 }
-

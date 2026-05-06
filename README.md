@@ -99,7 +99,7 @@ Percentage:
 ```bash
 curl -X POST http://localhost:8080/v1/operations/percentage \
   -H "Content-Type: application/json" \
-  -d '{"operand":25}'
+  -d '{"operand_a":50,"operand_b":90}'
 ```
 
 Health check:

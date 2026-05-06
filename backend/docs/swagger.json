@@ -49,7 +49,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -57,13 +57,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -88,7 +88,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -96,13 +96,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -127,7 +127,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -135,13 +135,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -161,12 +161,12 @@
                 "summary": "Calculate percentage",
                 "parameters": [
                     {
-                        "description": "Operand",
+                        "description": "Operands",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UnaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -174,13 +174,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -205,7 +205,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -213,13 +213,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -244,7 +244,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UnaryOperationRequest"
+                            "$ref": "#/definitions/calculator.UnaryOperationRequest"
                         }
                     }
                 ],
@@ -252,13 +252,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -283,7 +283,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BinaryOperationRequest"
+                            "$ref": "#/definitions/calculator.BinaryOperationRequest"
                         }
                     }
                 ],
@@ -291,13 +291,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CalculateResponse"
+                            "$ref": "#/definitions/calculator.CalculateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
+                            "$ref": "#/definitions/calculator.ErrorResponse"
                         }
                     }
                 }
@@ -305,7 +305,7 @@
         }
     },
     "definitions": {
-        "dto.BinaryOperationRequest": {
+        "calculator.BinaryOperationRequest": {
             "type": "object",
             "properties": {
                 "operand_a": {
@@ -318,7 +318,7 @@
                 }
             }
         },
-        "dto.CalculateResponse": {
+        "calculator.CalculateResponse": {
             "type": "object",
             "properties": {
                 "result": {
@@ -327,7 +327,7 @@
                 }
             }
         },
-        "dto.ErrorResponse": {
+        "calculator.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -336,7 +336,7 @@
                 }
             }
         },
-        "dto.UnaryOperationRequest": {
+        "calculator.UnaryOperationRequest": {
             "type": "object",
             "properties": {
                 "operand": {

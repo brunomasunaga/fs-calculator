@@ -52,8 +52,8 @@ export async function sqrt(a: number): Promise<number> {
   return postUnary('/v1/operations/sqrt', { operand: a })
 }
 
-export async function percentage(a: number): Promise<number> {
-  return postUnary('/v1/operations/percentage', { operand: a })
+export async function percentage(a: number, b: number): Promise<number> {
+  return postBinary('/v1/operations/percentage', { operand_a: a, operand_b: b })
 }
 
 export async function calculate(
@@ -75,7 +75,7 @@ export async function calculate(
     case 'sqrt':
       return sqrt(a)
     case 'percentage':
-      return percentage(a)
+      return percentage(a, b ?? 0)
   }
 }
 

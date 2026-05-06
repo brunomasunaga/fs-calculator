@@ -2,9 +2,9 @@
 
 Go + Gin service that exposes calculator endpoints. The code is split into a thin HTTP layer and a business layer:
 
-- `internal/controller`: request parsing, validation, and HTTP responses
+- `internal/controller/calculator`: calculator HTTP handlers, request/response contracts, and binding helpers
 - `internal/service`: calculator operations and domain errors
-- `internal/dto`: request and response payloads
+- `internal/controller`: shared HTTP controllers such as health and docs
 - `internal/router`: route registration, CORS, and Swagger wiring
 
 There is no repository layer because the application is stateless and does not persist data.
@@ -116,7 +116,7 @@ Percentage:
 ```bash
 curl -X POST http://localhost:8080/v1/operations/percentage \
   -H "Content-Type: application/json" \
-  -d '{"operand":25}'
+  -d '{"operand_a":50,"operand_b":90}'
 ```
 
 Health check:

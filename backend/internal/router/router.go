@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
+	calculatorcontroller "github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ type Config struct {
 }
 
 type Dependencies struct {
-	CalculatorController *controller.CalculatorController
+	CalculatorController *calculatorcontroller.CalculatorController
 	HealthController     *controller.HealthController
 	SwaggerController    *controller.SwaggerController
 }

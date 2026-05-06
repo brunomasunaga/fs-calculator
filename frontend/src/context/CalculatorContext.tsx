@@ -8,7 +8,7 @@ import {
 
 import { calculate, type CalculatorOperation } from '@/api/calculator'
 
-type BinaryOperation = Exclude<CalculatorOperation, 'sqrt' | 'percentage'>
+type BinaryOperation = Exclude<CalculatorOperation, 'sqrt'>
 
 type CalculatorContextValue = {
   display: string
@@ -21,7 +21,7 @@ type CalculatorContextValue = {
   inputEquals: () => Promise<void>
   inputClear: () => void
   inputSqrt: () => Promise<void>
-  inputPercentage: () => Promise<void>
+  inputPercentage: () => void
   inputDecimal: () => void
 }
 
@@ -35,6 +35,7 @@ const operationMap: Record<string, BinaryOperation> = {
   '÷': 'divide',
   '/': 'divide',
   '^': 'power',
+  '%': 'percentage',
 }
 
 export function CalculatorProvider({ children }: PropsWithChildren) {
@@ -98,8 +99,8 @@ export function CalculatorProvider({ children }: PropsWithChildren) {
     await runUnaryOperation('sqrt')
   }
 
-  const inputPercentage = async () => {
-    await runUnaryOperation('percentage')
+  const inputPercentage = () => {
+    inputOperation('%')
   }
 
   const inputDecimal = () => {
@@ -117,7 +118,7 @@ export function CalculatorProvider({ children }: PropsWithChildren) {
   }
 
   const runUnaryOperation = async (
-    nextOperation: Extract<CalculatorOperation, 'sqrt' | 'percentage'>,
+    nextOperation: Extract<CalculatorOperation, 'sqrt'>,
   ) => {
     try {
       const result = await calculate(nextOperation, parseDisplay(display))

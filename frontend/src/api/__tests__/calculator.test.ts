@@ -65,16 +65,22 @@ describe('calculator api', () => {
   it('posts unary operations to the expected endpoints', async () => {
     mockedClient.post
       .mockResolvedValueOnce({ data: { result: 5 } })
-      .mockResolvedValueOnce({ data: { result: 0.25 } })
 
     await expect(sqrt(25)).resolves.toBe(5)
-    await expect(percentage(25)).resolves.toBe(0.25)
 
     expect(mockedClient.post).toHaveBeenNthCalledWith(1, '/v1/operations/sqrt', {
       operand: 25,
     })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(2, '/v1/operations/percentage', {
-      operand: 25,
+  })
+
+  it('posts percentage as a binary operation', async () => {
+    mockedClient.post.mockResolvedValueOnce({ data: { result: 45 } })
+
+    await expect(percentage(50, 90)).resolves.toBe(45)
+
+    expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/percentage', {
+      operand_a: 50,
+      operand_b: 90,
     })
   })
 
@@ -86,7 +92,7 @@ describe('calculator api', () => {
       .mockResolvedValueOnce({ data: { result: 2 } })
       .mockResolvedValueOnce({ data: { result: 8 } })
       .mockResolvedValueOnce({ data: { result: 4 } })
-      .mockResolvedValueOnce({ data: { result: 0.5 } })
+      .mockResolvedValueOnce({ data: { result: 45 } })
 
     await expect(calculate('add', 1, 2)).resolves.toBe(3)
     await expect(calculate('subtract', 5, 3)).resolves.toBe(2)
@@ -94,7 +100,7 @@ describe('calculator api', () => {
     await expect(calculate('divide', 8, 4)).resolves.toBe(2)
     await expect(calculate('power', 2, 3)).resolves.toBe(8)
     await expect(calculate('sqrt', 16)).resolves.toBe(4)
-    await expect(calculate('percentage', 50)).resolves.toBe(0.5)
+    await expect(calculate('percentage', 50, 90)).resolves.toBe(45)
   })
 
   it('normalizes axios api errors', async () => {

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
+	calculatorcontroller "github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -83,9 +84,9 @@ func TestSetupRouterOperations(t *testing.T) {
 			name:           "percentage",
 			method:         http.MethodPost,
 			path:           "/v1/operations/percentage",
-			body:           `{"operand":25}`,
+			body:           `{"operand_a":50,"operand_b":90}`,
 			expectedStatus: http.StatusOK,
-			expectedBody:   `{"result":0.25}`,
+			expectedBody:   `{"result":45}`,
 		},
 		{
 			name:           "division by zero",
@@ -225,7 +226,7 @@ func init() {
 
 func buildTestRouter() *gin.Engine {
 	svc := service.NewCalculatorService()
-	calculatorController := controller.NewCalculatorController(svc)
+	calculatorController := calculatorcontroller.NewCalculatorController(svc)
 	healthController := controller.NewHealthController()
 	swaggerController := controller.NewSwaggerController()
 
