@@ -2,3 +2,6 @@
 backend/bin/
 backend/coverage.html
 backend/coverage.out
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/

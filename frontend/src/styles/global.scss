@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #f3efe7;
+  --color-card: #fffaf1;
+  --color-border: #d9cfba;
+  --color-text: #1f2933;
+  --color-primary: #f06c2b;
+  --color-secondary: #0f766e;
+  --color-accent: #f1c453;
+  --color-danger: #c2410c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Manrope', sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(240, 108, 43, 0.14), transparent 32%),
+    linear-gradient(135deg, #f8f3ea 0%, #efe2d1 100%);
+  color: var(--color-text);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 2rem;
+}
+
+.status-card {
+  max-width: 36rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  background: rgba(255, 250, 241, 0.88);
+  box-shadow: 0 24px 80px rgba(31, 41, 51, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.status-card h1 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.status-card p {
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--color-secondary);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
