@@ -23,6 +23,14 @@ make run
 
 The server listens on `:8080` by default. Override it with `PORT`.
 
+## Hot reload in Docker
+
+```bash
+make docker-dev
+```
+
+The default Docker setup uses `air` to rebuild and restart the API automatically when Go source files change.
+
 ## Build and test
 
 ```bash
@@ -42,9 +50,10 @@ make lint
 ## Docker
 
 ```bash
-make docker-build
-make docker-run
+make docker-dev
 ```
+
+That starts the default hot-reload stack through the root `docker-compose.yml`.
 
 ## API examples
 

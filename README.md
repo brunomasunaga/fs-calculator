@@ -8,6 +8,13 @@ Full-stack calculator application with a Go API and a React frontend.
 docker compose up --build
 ```
 
+This is the default Docker workflow and it is hot-reload oriented:
+
+- backend runs through `air` and rebuilds/restarts on Go file changes
+- frontend runs the Vite dev server with polling enabled for Docker-mounted files
+- source code is bind-mounted into both containers
+- Go module/build caches and frontend `node_modules` stay in Docker volumes
+
 After the containers start:
 
 - Frontend: `http://localhost:3000`
@@ -128,7 +135,7 @@ Trade-offs:
 - Context API over Redux: one feature, one page, low shared-state complexity.
 - Axios over `fetch`: simpler error normalization and endpoint helpers.
 - ShadCN-style primitives: reusable button/card building blocks without locking the page layout into a generic template.
-- Multi-stage Docker builds: smaller production images and cleaner runtime containers.
+- Docker bind mounts + cached volumes: fast feedback without reinstalling dependencies on every change.
 
 ## Layout and design rationale
 

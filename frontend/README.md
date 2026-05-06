@@ -25,7 +25,15 @@ npm install
 npm run dev
 ```
 
-The Vite dev server runs on `http://localhost:5173`. Set `VITE_API_URL` if the backend is not on `http://localhost:8080`.
+The Vite dev server runs on `http://localhost:3000`. By default the app calls `/api/v1/...` and expects the Vite proxy to forward those requests. Set `VITE_API_URL` only when you want to bypass the proxy and hit a backend directly.
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+The default Docker setup bind-mounts the source tree, runs Vite in dev mode, and proxies `/api` requests to the backend container through `VITE_PROXY_TARGET=http://backend:8080`.
 
 ## Scripts
 
@@ -39,15 +47,6 @@ npm run test:coverage
 npm run lint
 npm run format
 ```
-
-## Docker
-
-```bash
-docker build -t fs-calculator-frontend .
-docker run --rm -p 3000:80 fs-calculator-frontend
-```
-
-The production container serves the built SPA with Nginx and proxies `/api` requests to the backend container.
 
 ## Tech choices
 

@@ -1,6 +1,6 @@
 APP_NAME := fs-calculator-backend
 
-.PHONY: build run test coverage lint fmt swagger docker-build docker-run
+.PHONY: build run test coverage lint fmt swagger docker-dev
 
 build:
 	go build -o bin/server ./cmd/server
@@ -25,9 +25,5 @@ fmt:
 swagger:
 	go run github.com/swaggo/swag/cmd/swag@v1.16.4 init -g cmd/server/main.go -o docs
 
-docker-build:
-	docker build -t $(APP_NAME) .
-
-docker-run:
-	docker run --rm -p 8080:8080 $(APP_NAME)
-
+docker-dev:
+	docker compose up --build

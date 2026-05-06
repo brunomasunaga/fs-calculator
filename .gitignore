@@ -1,5 +1,6 @@
 .DS_Store
 backend/bin/
+backend/tmp/
 backend/coverage.html
 backend/coverage.out
 frontend/node_modules/
