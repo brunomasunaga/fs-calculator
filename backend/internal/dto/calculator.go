@@ -2,13 +2,13 @@ package dto
 
 // BinaryOperationRequest represents a request with two operands.
 type BinaryOperationRequest struct {
-	OperandA float64 `json:"operand_a" binding:"required" example:"10.5"`
-	OperandB float64 `json:"operand_b" binding:"required" example:"3.2"`
+	OperandA float64 `json:"operand_a" example:"10.5"`
+	OperandB float64 `json:"operand_b" example:"3.2"`
 }
 
 // UnaryOperationRequest represents a request with one operand.
 type UnaryOperationRequest struct {
-	Operand float64 `json:"operand" binding:"required" example:"25"`
+	Operand float64 `json:"operand" example:"25"`
 }
 
 // CalculateResponse represents a successful calculation result.

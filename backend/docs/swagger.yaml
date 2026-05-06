@@ -1,0 +1,209 @@
+basePath: /
+definitions:
+  dto.BinaryOperationRequest:
+    properties:
+      operand_a:
+        example: 10.5
+        type: number
+      operand_b:
+        example: 3.2
+        type: number
+    type: object
+  dto.CalculateResponse:
+    properties:
+      result:
+        example: 13.7
+        type: number
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        example: division by zero
+        type: string
+    type: object
+  dto.UnaryOperationRequest:
+    properties:
+      operand:
+        example: 25
+        type: number
+    type: object
+info:
+  contact: {}
+  description: REST API for arithmetic and advanced calculator operations.
+  title: FS Calculator API
+  version: "1.0"
+paths:
+  /api/v1/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operands
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BinaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Add two numbers
+  /api/v1/divide:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operands
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BinaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Divide two numbers
+  /api/v1/health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+  /api/v1/multiply:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operands
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BinaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Multiply two numbers
+  /api/v1/percentage:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operand
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UnaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Calculate percentage
+  /api/v1/power:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operands
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BinaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Raise a number to a power
+  /api/v1/sqrt:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operand
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UnaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Calculate a square root
+  /api/v1/subtract:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Operands
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BinaryOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Subtract two numbers
+swagger: "2.0"
