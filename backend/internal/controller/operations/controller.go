@@ -113,7 +113,13 @@ func (oc *OperationsController) Power(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, CalculateResponse{Result: oc.svc.Power(req.OperandA, req.OperandB)})
+	result, err := oc.svc.Power(req.OperandA, req.OperandB)
+	if err != nil {
+		writeError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, CalculateResponse{Result: result})
 }
 
 // Sqrt calculates the square root of a single operand.

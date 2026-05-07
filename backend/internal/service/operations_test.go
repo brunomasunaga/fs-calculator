@@ -40,7 +40,8 @@ func TestOperationsServiceBinaryOperations(t *testing.T) {
 		{
 			name: "power",
 			operation: func() float64 {
-				return svc.Power(2, 3)
+				result, _ := svc.Power(2, 3)
+				return result
 			},
 			expected: 8,
 		},
