@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
-	"github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
+	"github.com/brunomasunaga/fs-calculator/backend/internal/controller/operations"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -225,15 +225,15 @@ func init() {
 }
 
 func buildTestRouter() *gin.Engine {
-	svc := service.NewCalculatorService()
-	calculatorController := calculator.NewCalculatorController(svc)
+	svc := service.NewOperationsService()
+	operationsController := operations.NewOperationsController(svc)
 	healthController := controller.NewHealthController()
 	swaggerController := controller.NewSwaggerController()
 
 	return SetupRouter(Config{
 		AllowedOrigins: []string{"http://localhost:3000"},
 	}, Dependencies{
-		CalculatorController: calculatorController,
+		OperationsController: operationsController,
 		HealthController:     healthController,
 		SwaggerController:    swaggerController,
 	})

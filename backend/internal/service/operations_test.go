@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculatorServiceBinaryOperations(t *testing.T) {
+func TestOperationsServiceBinaryOperations(t *testing.T) {
 	t.Parallel()
 
-	svc := NewCalculatorService()
+	svc := NewOperationsService()
 
 	testCases := []struct {
 		name      string
@@ -62,10 +62,10 @@ func TestCalculatorServiceBinaryOperations(t *testing.T) {
 	}
 }
 
-func TestCalculatorServiceDivide(t *testing.T) {
+func TestOperationsServiceDivide(t *testing.T) {
 	t.Parallel()
 
-	svc := NewCalculatorService()
+	svc := NewOperationsService()
 
 	testCases := []struct {
 		name        string
@@ -107,10 +107,10 @@ func TestCalculatorServiceDivide(t *testing.T) {
 	}
 }
 
-func TestCalculatorServiceSqrt(t *testing.T) {
+func TestOperationsServiceSqrt(t *testing.T) {
 	t.Parallel()
 
-	svc := NewCalculatorService()
+	svc := NewOperationsService()
 
 	testCases := []struct {
 		name        string

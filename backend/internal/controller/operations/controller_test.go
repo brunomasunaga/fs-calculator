@@ -1,4 +1,4 @@
-package calculator
+package operations
 
 import (
 	"encoding/json"
@@ -13,122 +13,122 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculatorControllerBinaryHandlers(t *testing.T) {
+func TestOperationsControllerBinaryHandlers(t *testing.T) {
 	testCases := []struct {
 		name           string
-		handler        func(*CalculatorController, *gin.Context)
+		handler        func(*OperationsController, *gin.Context)
 		body           string
 		expectedStatus int
 		expectedBody   map[string]any
 	}{
 		{
 			name:           "add success",
-			handler:        (*CalculatorController).Add,
+			handler:        (*OperationsController).Add,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 12.0},
 		},
 		{
 			name:           "subtract success",
-			handler:        (*CalculatorController).Subtract,
+			handler:        (*OperationsController).Subtract,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 8.0},
 		},
 		{
 			name:           "subtract invalid json",
-			handler:        (*CalculatorController).Subtract,
+			handler:        (*OperationsController).Subtract,
 			body:           `{`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "unexpected EOF"},
 		},
 		{
 			name:           "multiply success",
-			handler:        (*CalculatorController).Multiply,
+			handler:        (*OperationsController).Multiply,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 20.0},
 		},
 		{
 			name:           "multiply missing operand b",
-			handler:        (*CalculatorController).Multiply,
+			handler:        (*OperationsController).Multiply,
 			body:           `{"operand_a":10}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "operand_b is required"},
 		},
 		{
 			name:           "power success",
-			handler:        (*CalculatorController).Power,
+			handler:        (*OperationsController).Power,
 			body:           `{"operand_a":2,"operand_b":3}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 8.0},
 		},
 		{
 			name:           "power invalid operand type",
-			handler:        (*CalculatorController).Power,
+			handler:        (*OperationsController).Power,
 			body:           `{"operand_a":"bad","operand_b":3}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "json: cannot unmarshal string into Go struct field BinaryOperationRequest.operand_a of type float64"},
 		},
 		{
 			name:           "percentage success",
-			handler:        (*CalculatorController).Percentage,
+			handler:        (*OperationsController).Percentage,
 			body:           `{"operand_a":50,"operand_b":90}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 45.0},
 		},
 		{
 			name:           "percentage missing operand b",
-			handler:        (*CalculatorController).Percentage,
+			handler:        (*OperationsController).Percentage,
 			body:           `{"operand_a":50}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "operand_b is required"},
 		},
 		{
 			name:           "divide success",
-			handler:        (*CalculatorController).Divide,
+			handler:        (*OperationsController).Divide,
 			body:           `{"operand_a":10,"operand_b":2}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 5.0},
 		},
 		{
 			name:           "divide invalid json",
-			handler:        (*CalculatorController).Divide,
+			handler:        (*OperationsController).Divide,
 			body:           `{`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "unexpected EOF"},
 		},
 		{
 			name:           "divide service error",
-			handler:        (*CalculatorController).Divide,
+			handler:        (*OperationsController).Divide,
 			body:           `{"operand_a":10,"operand_b":0}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": service.ErrDivisionByZero.Error()},
 		},
 		{
 			name:           "invalid json",
-			handler:        (*CalculatorController).Add,
+			handler:        (*OperationsController).Add,
 			body:           `{"operand_a":10,`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "unexpected EOF"},
 		},
 		{
 			name:           "invalid operand type",
-			handler:        (*CalculatorController).Add,
+			handler:        (*OperationsController).Add,
 			body:           `{"operand_a":"bad","operand_b":2}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "json: cannot unmarshal string into Go struct field BinaryOperationRequest.operand_a of type float64"},
 		},
 		{
 			name:           "missing fields",
-			handler:        (*CalculatorController).Add,
+			handler:        (*OperationsController).Add,
 			body:           `{"operand_a":10}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "operand_b is required"},
 		},
 		{
 			name:           "missing operand a",
-			handler:        (*CalculatorController).Add,
+			handler:        (*OperationsController).Add,
 			body:           `{"operand_b":10}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "operand_a is required"},
@@ -144,7 +144,7 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			ctx.Request = req
 
-			controller := NewCalculatorController(service.NewCalculatorService())
+			controller := NewOperationsController(service.NewOperationsService())
 			tc.handler(controller, ctx)
 
 			assert.Equal(t, tc.expectedStatus, recorder.Code)
@@ -157,45 +157,45 @@ func TestCalculatorControllerBinaryHandlers(t *testing.T) {
 	}
 }
 
-func TestCalculatorControllerUnaryHandlers(t *testing.T) {
+func TestOperationsControllerUnaryHandlers(t *testing.T) {
 	testCases := []struct {
 		name           string
-		handler        func(*CalculatorController, *gin.Context)
+		handler        func(*OperationsController, *gin.Context)
 		body           string
 		expectedStatus int
 		expectedBody   map[string]any
 	}{
 		{
 			name:           "sqrt success",
-			handler:        (*CalculatorController).Sqrt,
+			handler:        (*OperationsController).Sqrt,
 			body:           `{"operand":25}`,
 			expectedStatus: http.StatusOK,
 			expectedBody:   map[string]any{"result": 5.0},
 		},
 		{
 			name:           "sqrt service error",
-			handler:        (*CalculatorController).Sqrt,
+			handler:        (*OperationsController).Sqrt,
 			body:           `{"operand":-1}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": service.ErrNegativeSqrt.Error()},
 		},
 		{
 			name:           "sqrt invalid json",
-			handler:        (*CalculatorController).Sqrt,
+			handler:        (*OperationsController).Sqrt,
 			body:           `{`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "unexpected EOF"},
 		},
 		{
 			name:           "sqrt invalid operand type",
-			handler:        (*CalculatorController).Sqrt,
+			handler:        (*OperationsController).Sqrt,
 			body:           `{"operand":"bad"}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "json: cannot unmarshal string into Go struct field UnaryOperationRequest.operand of type float64"},
 		},
 		{
 			name:           "sqrt missing operand",
-			handler:        (*CalculatorController).Sqrt,
+			handler:        (*OperationsController).Sqrt,
 			body:           `{}`,
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   map[string]any{"error": "operand is required"},
@@ -211,7 +211,7 @@ func TestCalculatorControllerUnaryHandlers(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			ctx.Request = req
 
-			controller := NewCalculatorController(service.NewCalculatorService())
+			controller := NewOperationsController(service.NewOperationsService())
 			tc.handler(controller, ctx)
 
 			assert.Equal(t, tc.expectedStatus, recorder.Code)

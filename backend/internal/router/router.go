@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
-	"github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
+	"github.com/brunomasunaga/fs-calculator/backend/internal/controller/operations"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ type Config struct {
 }
 
 type Dependencies struct {
-	CalculatorController *calculator.CalculatorController
+	OperationsController *operations.OperationsController
 	HealthController     *controller.HealthController
 	SwaggerController    *controller.SwaggerController
 }
@@ -29,15 +29,18 @@ func SetupRouter(cfg Config, deps Dependencies) *gin.Engine {
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
 	}))
 
-	operations := engine.Group("/v1/operations")
+	v1 := engine.Group("/v1")
 	{
-		operations.POST("/add", deps.CalculatorController.Add)
-		operations.POST("/subtract", deps.CalculatorController.Subtract)
-		operations.POST("/multiply", deps.CalculatorController.Multiply)
-		operations.POST("/divide", deps.CalculatorController.Divide)
-		operations.POST("/power", deps.CalculatorController.Power)
-		operations.POST("/sqrt", deps.CalculatorController.Sqrt)
-		operations.POST("/percentage", deps.CalculatorController.Percentage)
+		operations := v1.Group("/operations")
+		{
+			operations.POST("/add", deps.OperationsController.Add)
+			operations.POST("/subtract", deps.OperationsController.Subtract)
+			operations.POST("/multiply", deps.OperationsController.Multiply)
+			operations.POST("/divide", deps.OperationsController.Divide)
+			operations.POST("/power", deps.OperationsController.Power)
+			operations.POST("/sqrt", deps.OperationsController.Sqrt)
+			operations.POST("/percentage", deps.OperationsController.Percentage)
+		}
 	}
 
 	engine.GET("/health", deps.HealthController.Health)

@@ -1,4 +1,4 @@
-package calculator
+package operations
 
 // BinaryOperationRequest represents a request with two operands.
 type BinaryOperationRequest struct {

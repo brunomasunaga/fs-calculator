@@ -19,8 +19,8 @@ func TestNewContainerBuildsDependencies(t *testing.T) {
 
 	assert.Equal(t, "8080", container.Config.Port)
 	assert.Equal(t, []string{"http://localhost:3000"}, container.Config.AllowedOrigins)
-	assert.NotNil(t, container.Services.Calculator)
-	assert.NotNil(t, container.Controllers.Calculator)
+	assert.NotNil(t, container.Services.Operations)
+	assert.NotNil(t, container.Controllers.Operations)
 	assert.NotNil(t, container.Controllers.Health)
 	assert.NotNil(t, container.Controllers.Swagger)
 	assert.NotNil(t, container.Router)

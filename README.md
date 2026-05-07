@@ -212,7 +212,7 @@ Other useful backend commands:
 ```bash
 make build
 make fmt
-make swagger
+make generate-docs
 ```
 
 ### Frontend

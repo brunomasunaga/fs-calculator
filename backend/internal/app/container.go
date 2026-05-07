@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/brunomasunaga/fs-calculator/backend/internal/config"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/controller"
-	calculatorcontroller "github.com/brunomasunaga/fs-calculator/backend/internal/controller/calculator"
+	operationscontroller "github.com/brunomasunaga/fs-calculator/backend/internal/controller/operations"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/router"
 	"github.com/brunomasunaga/fs-calculator/backend/internal/service"
 	"github.com/gin-gonic/gin"
@@ -17,22 +17,22 @@ type Container struct {
 }
 
 type Services struct {
-	Calculator service.CalculatorService
+	Operations service.OperationsService
 }
 
 type Controllers struct {
-	Calculator *calculatorcontroller.CalculatorController
+	Operations *operationscontroller.OperationsController
 	Health     *controller.HealthController
 	Swagger    *controller.SwaggerController
 }
 
 func NewContainer(cfg config.Config) *Container {
 	services := Services{
-		Calculator: service.NewCalculatorService(),
+		Operations: service.NewOperationsService(),
 	}
 
 	controllers := Controllers{
-		Calculator: calculatorcontroller.NewCalculatorController(services.Calculator),
+		Operations: operationscontroller.NewOperationsController(services.Operations),
 		Health:     controller.NewHealthController(),
 		Swagger:    controller.NewSwaggerController(),
 	}
@@ -40,7 +40,7 @@ func NewContainer(cfg config.Config) *Container {
 	engine := router.SetupRouter(router.Config{
 		AllowedOrigins: cfg.AllowedOrigins,
 	}, router.Dependencies{
-		CalculatorController: controllers.Calculator,
+		OperationsController: controllers.Operations,
 		HealthController:     controllers.Health,
 		SwaggerController:    controllers.Swagger,
 	})

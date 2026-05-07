@@ -1,4 +1,4 @@
-package calculator
+package operations
 
 // CalculateResponse represents a successful calculation result.
 type CalculateResponse struct {

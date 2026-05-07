@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  calculator.BinaryOperationRequest:
+  operations.BinaryOperationRequest:
     properties:
       operand_a:
         example: 10.5
@@ -9,19 +9,19 @@ definitions:
         example: 3.2
         type: number
     type: object
-  calculator.CalculateResponse:
+  operations.CalculateResponse:
     properties:
       result:
         example: 13.7
         type: number
     type: object
-  calculator.ErrorResponse:
+  operations.ErrorResponse:
     properties:
       error:
         example: division by zero
         type: string
     type: object
-  calculator.UnaryOperationRequest:
+  operations.UnaryOperationRequest:
     properties:
       operand:
         example: 25
@@ -57,18 +57,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Add two numbers
       tags:
       - Operations
@@ -82,18 +82,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Divide two numbers
       tags:
       - Operations
@@ -107,18 +107,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Multiply two numbers
       tags:
       - Operations
@@ -132,18 +132,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Calculate percentage
       tags:
       - Operations
@@ -157,18 +157,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Raise a number to a power
       tags:
       - Operations
@@ -182,18 +182,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.UnaryOperationRequest'
+          $ref: '#/definitions/operations.UnaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Calculate a square root
       tags:
       - Operations
@@ -207,18 +207,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/calculator.BinaryOperationRequest'
+          $ref: '#/definitions/operations.BinaryOperationRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/calculator.CalculateResponse'
+            $ref: '#/definitions/operations.CalculateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.ErrorResponse'
+            $ref: '#/definitions/operations.ErrorResponse'
       summary: Subtract two numbers
       tags:
       - Operations
