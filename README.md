@@ -284,3 +284,14 @@ npm run test:watch     # run Vitest in watch mode
 npm run test:coverage  # run tests with coverage and write frontend/coverage
 npm run format         # format frontend files with Prettier
 ```
+
+## 🤖 AI usage
+
+> AI was used as an implementation assistant, with human-provided assessment context and prompt direction.
+
+- **Given problem**: `.agents/inputs/assessment.md`
+- **Initial manual prompt**: `.agents/inputs/task.md`
+- **AI-generated plan**: `.agents/inputs/plan.md`
+- **Prompt trail**: `.agents/logs.txt`
+- **Models used**: Claude Opus 4.6, Codex GPT-5.4, Codex GPT-5.5
+- **Usage**: planning, implementation, refactoring, test coverage, UI iteration, and documentation.

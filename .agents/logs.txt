@@ -1,0 +1,21 @@
+[Claude Opus 4.6] read task.md and create a detailed technical plan to implement the task. Split it into smaller, deterministic and decoupled tasks, so you can split the work between different agents. Put it into .agents/outputs folder.
+
+[Claude Opus 4.6] in the frontend part, in the project structure and with everyhting that changes in the plan, do a better separation of concerns for components -> ui folder for pure reusable shadcn components. then, in another subtree, the pages and inside them the components of that specific page. also why using hooks? can the context api give the tools enough to manage everything?   
+
+[Codex GPT-5.4] look at the plan.md in .agents. implement the tasks and open a pr for every task. pr descriptions should be concise, direct, using topics and emojis to better communicate whats being done. they should not mention ai or codex
+
+[Codex GPT-5.5] evaluate the current implementation against .agents/inputs/task.md and .agents/inputs/plan.md. Keep the 3-tier Go backend, but adjust the routes to /v1/operations/{operation}, expose Swagger at /docs, add config/container/router tests, and make sure make test and make coverage work.
+
+[Codex GPT-5.5] refactor the backend operations package so request binding, response types, controller handlers, service rules, Swagger controller, health controller, and router registration have clear responsibilities. Keep the app stateless, avoid a repository layer, and preserve controller -> service dependency direction.
+
+[Codex GPT-5.5] scaffold the frontend with React, TypeScript, Vite, Tailwind, SCSS, shadcn-style UI primitives, Axios, Vitest, and Testing Library. Keep reusable primitives in components/ui and calculator-specific pieces under pages/calculator/components.
+
+[Codex GPT-5.5] replace the initial Context API calculator state with a smaller Zustand store because the interaction flow is growing. Extract pure calculator state helpers under store/calculator/state.ts, operation symbol mapping under store/calculator/operations.ts, and backend API calls under services/operations.
+
+[Codex GPT-5.5] improve the calculator interaction model: support negative numbers, decimals, backspace behavior, incomplete binary operations, unary square root against the active operand, operation chaining, resolved expression history, backend error display, and non-finite result handling.
+
+[Codex GPT-5.5] redesign the calculator UI to follow the macOS Calculator visual reference. Use shadcn-style button/card primitives, Tailwind utilities, global SCSS tokens, responsive sizing, grouped operation buttons, and display formatting for long decimals, expressions, and scientific notation.
+
+[Codex GPT-5.5] run frontend coverage and add meaningful tests where it makes sense. Cover the Zustand store, pure calculator state transitions, operation mapping, Axios client error normalization, and display presentation helpers. Keep the tests behavior-focused, not just line-coverage-focused.
+
+[Codex GPT-5.5] simplify the calculator store by removing the evaluation-id stale request management. Keep async evaluation straightforward: clear error, await the backend operation, apply the result, or set the normalized error. Update tests to reflect the simpler behavior.
