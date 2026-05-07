@@ -1,18 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-background: #f3efe7;
-  --color-card: #fffaf1;
-  --color-border: #d9cfba;
-  --color-text: #1f2933;
-  --color-primary: #f06c2b;
-  --color-secondary: #0f766e;
-  --color-accent: #f1c453;
-  --color-danger: #c2410c;
+  --color-background: #0f0f10;
+  --color-card: #1c1c1e;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-text: #f5f5f7;
+  --color-primary: #ff9500;
+  --color-secondary: #8e8e93;
+  --color-accent: #4b4b4f;
+  --color-danger: #ff8a80;
 }
 
 * {
@@ -22,10 +20,16 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Manrope', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue',
+    sans-serif;
   background:
-    radial-gradient(circle at top, rgba(240, 108, 43, 0.14), transparent 32%),
-    linear-gradient(135deg, #f8f3ea 0%, #efe2d1 100%);
+    radial-gradient(
+      circle at 50% -12%,
+      rgba(255, 255, 255, 0.1),
+      transparent 20%
+    ),
+    linear-gradient(180deg, #2d2d30 0%, #161618 26%, #0b0b0c 100%);
   color: var(--color-text);
 }
 
@@ -38,48 +42,13 @@ select {
 
 #root {
   min-height: 100vh;
-}
-
-.app-shell {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 2rem;
-}
-
-.status-card {
-  max-width: 36rem;
-  border: 1px solid var(--color-border);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  background: rgba(255, 250, 241, 0.88);
-  box-shadow: 0 24px 80px rgba(31, 41, 51, 0.12);
-  backdrop-filter: blur(12px);
-}
-
-.status-card h1 {
-  margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-}
-
-.status-card p {
-  margin-bottom: 0;
-  line-height: 1.7;
-}
-
-.eyebrow {
-  margin: 0 0 0.75rem;
-  color: var(--color-secondary);
-  font-family: 'IBM Plex Mono', monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  min-height: 100dvh;
 }
 
 @keyframes calculator-rise {
   from {
     opacity: 0;
-    transform: translateY(22px) scale(0.98);
+    transform: translateY(20px) scale(0.985);
   }
 
   to {
@@ -88,71 +57,39 @@ select {
   }
 }
 
-@keyframes orb-drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(0, -18px, 0) scale(1.05);
-  }
-}
-
 .calculator-stage {
-  position: relative;
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  overflow: hidden;
-  padding: 1.5rem;
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
 }
 
 .calculator-shell {
   animation: calculator-rise 420ms ease-out;
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 10%),
+    linear-gradient(180deg, #333336 0%, #27272a 12%, #1c1c1e 32%, #171719 100%);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
 }
 
-.calculator-orb {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(10px);
-  opacity: 0.8;
-  animation: orb-drift 12s ease-in-out infinite;
-}
-
-.calculator-orb--primary {
-  top: 10%;
-  left: 6%;
-  width: 14rem;
-  height: 14rem;
-  background: radial-gradient(circle, rgba(240, 108, 43, 0.35), transparent 68%);
-}
-
-.calculator-orb--secondary {
-  right: 10%;
-  bottom: 12%;
-  width: 16rem;
-  height: 16rem;
-  background: radial-gradient(circle, rgba(15, 118, 110, 0.28), transparent 68%);
-  animation-delay: -6s;
-}
-
-@media (max-width: 640px) {
+/* Mobile: full screen */
+@media (max-width: 639px) {
   .calculator-stage {
-    padding: 1rem;
+    padding: 0;
+    align-items: stretch;
   }
 
-  .calculator-orb--primary {
-    top: 3%;
-    left: -2rem;
-    width: 10rem;
-    height: 10rem;
-  }
-
-  .calculator-orb--secondary {
-    right: -2rem;
-    bottom: 8%;
-    width: 12rem;
-    height: 12rem;
+  .calculator-shell {
+    border-radius: 0;
+    border: none;
+    flex: 1;
+    min-height: 100dvh;
+    box-shadow: none;
   }
 }
