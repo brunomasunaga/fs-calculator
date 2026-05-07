@@ -3,152 +3,259 @@ import {
   type PropsWithChildren,
   startTransition,
   useContext,
-  useState,
+  useReducer,
+  useRef,
 } from 'react'
 
-import { calculate, type CalculatorOperation } from '@/api/calculator'
+import {
+  type BinaryOperationSymbol,
+  executeBinaryOperation,
+  executeUnaryOperation,
+  formatBinaryResolvedExpression,
+  formatUnaryResolvedExpression,
+} from '@/context/calculator-operations'
+import {
+  calculatorReducer,
+  getBinaryEvaluationRequest,
+  getUnaryEvaluationTarget,
+  initialCalculatorState,
+  selectDisplay,
+  selectError,
+  selectResolvedExpression,
+  shouldTreatMinusAsNegativeSign,
+} from '@/context/calculator-state'
 
-type BinaryOperation = Exclude<CalculatorOperation, 'sqrt'>
+type StandardBinaryOperationSymbol = Exclude<BinaryOperationSymbol, '-'>
 
 type CalculatorContextValue = {
   display: string
-  operandA: number | null
-  operation: string | null
-  waitingForOperandB: boolean
+  resolvedExpression: string | null
   error: string | null
   inputDigit: (digit: string) => void
-  inputOperation: (operation: string) => void
+  inputOperation: (operation: StandardBinaryOperationSymbol) => Promise<void>
+  inputMinus: () => Promise<void>
   inputEquals: () => Promise<void>
   inputClear: () => void
+  inputBackspace: () => void
   inputSqrt: () => Promise<void>
-  inputPercentage: () => void
+  inputPercentage: () => Promise<void>
   inputDecimal: () => void
 }
 
 const CalculatorContext = createContext<CalculatorContextValue | null>(null)
 
-const operationMap: Record<string, BinaryOperation> = {
-  '+': 'add',
-  '-': 'subtract',
-  '×': 'multiply',
-  '*': 'multiply',
-  '÷': 'divide',
-  '/': 'divide',
-  '^': 'power',
-  '%': 'percentage',
-}
-
 export function CalculatorProvider({ children }: PropsWithChildren) {
-  const [display, setDisplay] = useState('0')
-  const [operandA, setOperandA] = useState<number | null>(null)
-  const [operation, setOperation] = useState<BinaryOperation | null>(null)
-  const [waitingForOperandB, setWaitingForOperandB] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [state, dispatch] = useReducer(
+    calculatorReducer,
+    initialCalculatorState,
+  )
+  const requestVersionRef = useRef(0)
 
-  const inputDigit = (digit: string) => {
-    setError(null)
-
-    if (waitingForOperandB) {
-      setDisplay(digit)
-      setWaitingForOperandB(false)
-      return
-    }
-
-    setDisplay((currentDisplay) =>
-      currentDisplay === '0' ? digit : `${currentDisplay}${digit}`,
-    )
+  const invalidatePendingRequests = () => {
+    requestVersionRef.current += 1
   }
 
-  const inputOperation = (nextOperation: string) => {
-    const mappedOperation = operationMap[nextOperation]
-    if (!mappedOperation) {
+  const beginEvaluation = () => {
+    const nextRequestVersion = requestVersionRef.current + 1
+    requestVersionRef.current = nextRequestVersion
+    dispatch({ type: 'evaluation-started' })
+    return nextRequestVersion
+  }
+
+  const isCurrentRequest = (requestVersion: number) =>
+    requestVersionRef.current === requestVersion
+
+  const inputDigit = (digit: string) => {
+    invalidatePendingRequests()
+    dispatch({ type: 'digit-input', digit })
+  }
+
+  const inputOperation = async (operation: BinaryOperationSymbol) => {
+    const pendingRequest = getBinaryEvaluationRequest(state)
+
+    if (!pendingRequest) {
+      invalidatePendingRequests()
+      dispatch({ type: 'binary-operation-selected', operation })
       return
     }
 
-    setError(null)
-    setOperandA(parseDisplay(display))
-    setOperation(mappedOperation)
-    setWaitingForOperandB(true)
+    const requestVersion = beginEvaluation()
+
+    try {
+      const result = await executeBinaryOperation(
+        pendingRequest.operation,
+        pendingRequest.lhs,
+        pendingRequest.rhs,
+      )
+
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
+
+      startTransition(() => {
+        dispatch({
+          type: 'binary-evaluation-succeeded',
+          result,
+          resolvedExpression: formatBinaryResolvedExpression(
+            pendingRequest.operation,
+            pendingRequest.lhsText,
+            pendingRequest.rhsText,
+          ),
+          nextOperation: operation,
+        })
+      })
+    } catch (requestError) {
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
+
+      startTransition(() => {
+        dispatch({
+          type: 'evaluation-failed',
+          error: getErrorMessage(requestError),
+        })
+      })
+    }
   }
 
   const inputEquals = async () => {
-    if (!operation || operandA === null) {
+    const pendingBinary = state.pendingBinary
+
+    if (!pendingBinary) {
       return
     }
 
+    const pendingRequest = getBinaryEvaluationRequest(state)
+
+    if (!pendingRequest) {
+      invalidatePendingRequests()
+      startTransition(() => {
+        dispatch({
+          type: 'binary-evaluation-resolved-locally',
+          value: pendingBinary.lhs,
+        })
+      })
+      return
+    }
+
+    const requestVersion = beginEvaluation()
+
     try {
-      const result = await calculate(operation, operandA, parseDisplay(display))
+      const result = await executeBinaryOperation(
+        pendingRequest.operation,
+        pendingRequest.lhs,
+        pendingRequest.rhs,
+      )
+
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
 
       startTransition(() => {
-        applyResolvedValue(result)
+        dispatch({
+          type: 'binary-evaluation-succeeded',
+          result,
+          resolvedExpression: formatBinaryResolvedExpression(
+            pendingRequest.operation,
+            pendingRequest.lhsText,
+            pendingRequest.rhsText,
+          ),
+        })
       })
     } catch (requestError) {
-      setError(getErrorMessage(requestError))
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
+
+      startTransition(() => {
+        dispatch({
+          type: 'evaluation-failed',
+          error: getErrorMessage(requestError),
+        })
+      })
     }
   }
 
   const inputClear = () => {
-    setDisplay('0')
-    setOperandA(null)
-    setOperation(null)
-    setWaitingForOperandB(false)
-    setError(null)
+    invalidatePendingRequests()
+    dispatch({ type: 'clear-input' })
   }
 
-  const inputSqrt = async () => {
-    await runUnaryOperation('sqrt')
-  }
-
-  const inputPercentage = () => {
-    inputOperation('%')
+  const inputBackspace = () => {
+    invalidatePendingRequests()
+    dispatch({ type: 'backspace-input' })
   }
 
   const inputDecimal = () => {
-    setError(null)
+    invalidatePendingRequests()
+    dispatch({ type: 'decimal-input' })
+  }
 
-    if (waitingForOperandB) {
-      setDisplay('0.')
-      setWaitingForOperandB(false)
+  const inputMinus = async () => {
+    if (shouldTreatMinusAsNegativeSign(state)) {
+      invalidatePendingRequests()
+      dispatch({ type: 'minus-input' })
       return
     }
 
-    setDisplay((currentDisplay) =>
-      currentDisplay.includes('.') ? currentDisplay : `${currentDisplay}.`,
-    )
+    await inputOperation('-')
   }
 
-  const runUnaryOperation = async (
-    nextOperation: Extract<CalculatorOperation, 'sqrt'>,
-  ) => {
+  const inputSqrt = async () => {
+    const target = getUnaryEvaluationTarget(state)
+
+    if (!target) {
+      return
+    }
+
+    const requestVersion = beginEvaluation()
+
     try {
-      const result = await calculate(nextOperation, parseDisplay(display))
+      const result = await executeUnaryOperation('√', target.value)
+
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
 
       startTransition(() => {
-        applyResolvedValue(result)
+        dispatch({
+          type: 'unary-evaluation-succeeded',
+          result,
+          resolvedExpression: formatUnaryResolvedExpression(
+            '√',
+            target.valueText,
+          ),
+          target: target.target,
+        })
       })
     } catch (requestError) {
-      setError(getErrorMessage(requestError))
+      if (!isCurrentRequest(requestVersion)) {
+        return
+      }
+
+      startTransition(() => {
+        dispatch({
+          type: 'evaluation-failed',
+          error: getErrorMessage(requestError),
+        })
+      })
     }
   }
 
-  const applyResolvedValue = (value: number) => {
-    setDisplay(formatDisplay(value))
-    setOperandA(null)
-    setOperation(null)
-    setWaitingForOperandB(false)
-    setError(null)
+  const inputPercentage = async () => {
+    await inputOperation('%')
   }
 
   const value: CalculatorContextValue = {
-    display,
-    operandA,
-    operation,
-    waitingForOperandB,
-    error,
+    display: selectDisplay(state),
+    resolvedExpression: selectResolvedExpression(state),
+    error: selectError(state),
     inputDigit,
     inputOperation,
+    inputMinus,
     inputEquals,
     inputClear,
+    inputBackspace,
     inputSqrt,
     inputPercentage,
     inputDecimal,
@@ -169,14 +276,6 @@ export function useCalculatorContext() {
   }
 
   return context
-}
-
-function parseDisplay(value: string) {
-  return Number.parseFloat(value)
-}
-
-function formatDisplay(value: number) {
-  return value.toString()
 }
 
 function getErrorMessage(error: unknown) {
