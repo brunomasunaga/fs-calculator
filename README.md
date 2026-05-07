@@ -1,51 +1,31 @@
-# FS Calculator ![Go](https://img.shields.io/badge/go-1.24+-00ADD8?style=flat&logo=go&logoColor=white) ![React](https://img.shields.io/badge/react-19-61DAFB?style=flat&logo=react&logoColor=black) ![Vite](https://img.shields.io/badge/vite-8-646CFF?style=flat&logo=vite&logoColor=white) ![Docker](https://img.shields.io/badge/docker-dev%20stack-2496ED?style=flat&logo=docker&logoColor=white)
+# Full-Stack Calculator ![Go](https://img.shields.io/badge/go-1.25+-00ADD8?style=flat&logo=go&logoColor=white) ![React](https://img.shields.io/badge/react-19-61DAFB?style=flat&logo=react&logoColor=black) ![Vite](https://img.shields.io/badge/vite-8-646CFF?style=flat&logo=vite&logoColor=white) ![Docker](https://img.shields.io/badge/docker-dev%20stack-2496ED?style=flat&logo=docker&logoColor=white)
 
 ## ⚡ The solution
-> FS Calculator is a full-stack arithmetic application with a Go REST API, a React client, and a Docker-first development workflow with hot reload on both sides.
+> This is a full-stack system to implement a basic operations calculator.
 
 The repository is split into two applications:
 
-- **Backend**: a Gin-based API that exposes health, docs, and versioned operation endpoints.
-- **Frontend**: a React + Vite single-page application that handles calculator state, user input, and API communication.
+- **Backend**: a Go Rest API that exposes the operation endpoints.
+- **Frontend**: a React single-page application that handles calculator state, user input, and API communication.
 
 Core stack:
 
 - **Backend**: Go, Gin, Swaggo, Air
-- **Frontend**: React, TypeScript, Vite, Vitest, Axios, Tailwind, SCSS
-- **Tooling**: Docker Compose for the default hot-reload workflow
+- **Frontend**: React, TypeScript, Vite, Vitest, Axios, Zustand, Tailwind, SCSS
+- **Tooling**: Docker Compose for executing both Frontend and Backend as a full-stack application with support for hot-reload in development environment
 
-The codebase follows a pragmatic layered design:
-
-- **Presentation layer**:
-  - **Concern**: receives HTTP requests, validates payloads, and returns consistent responses.
-  - **Components**: Gin router, operations controller, health controller, Swagger controller.
-
-- **Service layer**:
-  - **Concern**: applies operation rules and returns domain-level errors without transport concerns.
-  - **Components**: `OperationsService`.
-
-- **Client layer**:
-  - **Concern**: renders the calculator UI, manages interaction flow, and calls backend operations.
-  - **Components**: React pages, context state, API client helpers.
-
-#### 🏗️ Backend architecture standards
+#### 🏗️ Backend code architecture
 ```text
 +-----------------------------+
-| internal/app                |
-| composition root            |
-| wires dependencies          |
+| GIN ROUTER                  |
+| (internal/router)           |
+| requests entry point        |
 +-----------------------------+
                |
                v
 +-----------------------------+
-| internal/router             |
-| registers routes            |
-| applies middleware          |
-+-----------------------------+
-               |
-               v
-+-----------------------------+
-| internal/controller/...     |
+| CONTROLLER                  |
+| (internal/controller/...)   |
 | owns HTTP contracts         |
 | validates input             |
 | writes responses            |
@@ -53,75 +33,102 @@ The codebase follows a pragmatic layered design:
                |
                v
 +-----------------------------+
-| internal/service            |
+| SERVICE                     |
+| (internal/service)          |
 | owns business rules         |
 | returns results / errors    |
-| has no transport concerns   |
 +-----------------------------+
 ```
 
-The backend follows a small set of rules:
-
-- `internal/app` is the composition root. It should wire dependencies together, but not contain request handling or business logic.
-- `internal/router` should define routes and middleware only. It should not implement validation or business rules.
-- `internal/controller/...` should translate between HTTP and the domain: bind requests, validate transport-level input, call services, and write responses.
-- `internal/service` should contain business behavior and domain errors. It should not depend on Gin, HTTP response types, or transport details.
-- Dependency direction should stay one-way: app -> router/controller -> service. Lower layers should not import higher layers.
+#### 🧩 Frontend code architecture
+```text
++----------------------------------+
+| PAGE                             |
+| (pages/calculator)               |
+| owns screen composition          |
+| renders display + keypad         |
++----------------------------------+
+               |
+               v
++----------------------------------+
+| COMPONENTS                       |
+| (pages/calculator/components     |
+|  + components/ui)                |
+| owns UI primitives               |
+| triggers user actions            |
++----------------------------------+
+               |
+               v
++----------------------------------+
+| ZUSTAND STORE                    |
+| (store/calculator/store)         |
+| owns interaction flow            |
+| exposes actions/selectors        |
++----------------------------------+
+               |
+               v
++----------------------------------+
+| STATE HELPERS                    |
+| (store/calculator/state)         |
+| owns input transitions           |
+| formats display state            |
++----------------------------------+
+               |
+               v
++----------------------------------+
+| API SERVICES                     |
+| (services/operations)            |
+| calls backend operations         |
+| normalizes client errors         |
++----------------------------------+
+```
 
 #### 📁 Folder structure
 ```text
-fs-calculator/              # root
+fs-calculator/                 # root
 ├── backend/
-│   ├── cmd/server/             # backend entrypoint
-│   ├── docs/                   # generated Swagger docs
+│   ├── cmd/server/            # backend entrypoint
+│   ├── docs/                  # generated Swagger docs
 │   ├── internal/
-│   │   ├── app/                # composition root / dependency wiring
-│   │   ├── config/             # env-based config loading
-│   │   ├── controller/         # HTTP adapters
-│   │   │   └── operations/     # operation handlers and request/response contracts
-│   │   ├── router/             # route registration
-│   │   └── service/            # operation business logic
-│   ├── Dockerfile              # backend dev image
-│   └── Makefile                # backend commands
+│   │   ├── app/               # composition root / dependency wiring
+│   │   ├── config/            # env-based config loading
+│   │   ├── controller/        # HTTP adapters
+│   │   │   └── operations/    # operation handlers and request/response contracts
+│   │   ├── router/            # route registration
+│   │   └── service/           # operation business logic
+│   ├── Dockerfile             # backend dev image
+│   └── Makefile               # backend commands
 ├── frontend/
-│   ├── public/                 # static assets
+│   ├── public/                # static assets
 │   ├── src/
-│   │   ├── api/                # HTTP client helpers and tests
-│   │   ├── components/         # shared UI primitives
-│   │   ├── context/            # calculator state management
-│   │   ├── pages/calculator/   # calculator screen and controls
-│   │   ├── styles/             # global styles
-│   │   └── test/               # frontend test setup
-│   ├── Dockerfile              # frontend dev image
-│   └── package.json            # frontend scripts and dependencies
-├── docker-compose.yml          # default hot-reload development stack
-└── README.md                   # repository guide
+│   │   ├── components/        # shared UI primitives
+│   │   ├── lib/               # frontend utilities
+│   │   ├── pages/calculator/  # calculator screen, controls, and display helpers
+│   │   ├── services/          # Axios client and operation API calls
+│   │   ├── store/calculator/  # Zustand store, operation mapping, and pure state helpers
+│   │   ├── styles/            # global styles
+│   │   └── test/              # frontend test setup
+│   ├── Dockerfile             # frontend dev image
+│   └── package.json           # frontend scripts and dependencies
+├── docker-compose.yml         # default hot-reload development stack
+└── README.md                  # repository guide
 ```
 
-## 🎯 The approach
+## 🤔 Trade-offs, assumptions and decisions
 
-1. Keep the API contract explicit with one endpoint per operation instead of a generic evaluator.
-2. Use manual dependency wiring in Go so construction stays visible and easy to extend.
-3. Keep HTTP contracts close to the operations controller instead of sharing a generic DTO package.
-4. Use a Docker-first workflow so backend and frontend can run with the same entrypoint.
-5. Preserve fast iteration with `air` on the backend and Vite HMR on the frontend.
-6. Cover controller, service, routing, config, and integration paths with automated tests.
-
-## 🤔 Trade-offs and decisions
-
-1. **Versioned operation routes**: the API uses `/v1/operations/...` so future versions can evolve without breaking clients.
-2. **Separate operation endpoints**: this adds more handlers, but keeps Swagger contracts and validation straightforward.
-3. **Pragmatic layering over strict hexagonal design**: the project uses dependency injection and explicit wiring without adding extra port abstractions that would not pay off yet.
-4. **Docker as the default development flow**: this avoids local tool mismatch, at the cost of Vite polling for reliable file watching in mounted volumes.
+1. **Separate operation endpoints**: this adds more handlers, but keeps Swagger contracts and validation straightforward. Also it moves away from the option of building an "expression evaluator", which defeats the purpose of the basic operations calculator.
+2. **Pragmatic layering over strict hexagonal design**: the project uses dependency injection and explicit wiring without adding extra port abstractions that would not pay off yet. The code can evolve to an hexagonal architecture easily if it grows.
+3. **Zustand over Context or Redux**: the calculator has a focused interaction model, so a small store is enough without Redux overhead.
+4. **String-based entry state**: the UI stores input as text so intermediate values like `-` and `0.` are valid while the user is typing.
 5. **No persistence layer**: the app is intentionally stateless, so introducing repositories or a database would only add noise.
 
-## 🔧 Potential improvements
 
-1. Add request logging and structured metrics for backend observability.
-2. Introduce frontend end-to-end tests against the running Docker stack.
-3. Expand calculator history or memory features if the UI grows beyond a single-screen flow.
-4. Add CI checks for lint, tests, Swagger generation, and coverage thresholds.
-5. If the backend gains more adapters, move toward consumer-owned ports for stricter dependency inversion.
+## 🎨 Frontend design choices
+
+1. **shadcn/ui structure**: the frontend keeps reusable UI primitives under `src/components/ui`, following the shadcn-style component organization configured in `components.json`.
+2. **Tailwind for layout utilities**: component spacing, sizing, responsive behavior, and common visual states use Tailwind classes so UI changes stay close to the markup.
+3. **SCSS for global visual tokens**: `src/styles/global.scss` owns global theme variables and application-level styling that should not live inside individual components.
+4. **macOS Calculator visual reference**: the UI intentionally follows the compact, tactile calculator pattern from the macOS calculator, with a display-first layout and grouped operation buttons.
 
 ## 🪛 Setting up
 
@@ -149,12 +156,6 @@ This is the default workflow. It starts:
 
 - the **backend** on `http://localhost:8080`
 - the **frontend** on `http://localhost:3000`
-
-The stack uses bind mounts plus Docker-managed caches:
-
-- Go source changes trigger rebuild/restart through `air`
-- frontend changes trigger Vite hot reload
-- Go module cache, Go build cache, and `node_modules` stay in Docker volumes
 
 ### 3. Environment variables
 
@@ -191,30 +192,11 @@ npm install
 npm run dev
 ```
 
-The frontend dev server runs on `http://localhost:3000`.
+## 📃 API Documentation
 
-By default, the UI calls `/v1/operations/...` and relies on the Vite proxy to forward requests to the backend. It also proxies `/health` and `/docs`.
+The API is documented with Swagger. Once the backend is running, documentation and examples are available at [http://localhost:8080/docs](http://localhost:8080/docs).
 
-`VITE_PROXY_TARGET` controls the proxy destination. In Docker it points to `http://backend:8080`.
-
-`VITE_API_URL` can be set when you want the browser to call a backend directly instead of using the local proxy.
-
-## 📃 Documentation
-
-Once the backend is running, the available endpoints include:
-
-- Health: `GET http://localhost:8080/health`
-- Swagger UI: `GET http://localhost:8080/docs`
-- Operations:
-  - `POST /v1/operations/add`
-  - `POST /v1/operations/subtract`
-  - `POST /v1/operations/multiply`
-  - `POST /v1/operations/divide`
-  - `POST /v1/operations/power`
-  - `POST /v1/operations/sqrt`
-  - `POST /v1/operations/percentage`
-
-Example:
+To test the API directly, you can do a curl like the example below:
 
 ```bash
 curl -X POST http://localhost:8080/v1/operations/percentage \
@@ -241,19 +223,17 @@ make test
 make coverage
 ```
 
-You can also run:
+From Docker, after the stack is running:
 
 ```bash
-go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8 run
+docker compose exec backend make test
+docker compose exec backend make coverage
 ```
 
-Other useful backend commands:
+The backend coverage command writes:
 
-```bash
-make build
-make fmt
-make generate-docs
-```
+- `backend/coverage.out`
+- `backend/coverage.html`
 
 ### Frontend
 
@@ -262,20 +242,45 @@ From `frontend/`:
 ```bash
 npm test
 npm run test:coverage
-npm run lint
 ```
 
-Other useful frontend commands:
+From Docker, after the stack is running:
 
 ```bash
-npm run build
-npm run test:watch
-npm run format
+docker compose exec frontend npm test
+docker compose exec frontend npm run test:coverage
 ```
 
-## 🧩 Frontend design choices
+The frontend coverage command writes the HTML report to:
 
-1. **Context API over Redux**: the app has a single focused calculator flow, so extra state tooling would add indirection without clear benefit.
-2. **Axios over fetch**: request helpers and error handling stay centralized and easier to evolve.
-3. **Tailwind plus SCSS**: layout utilities are fast to work with, while global tokens and theme styling stay in one place.
-4. **Small UI primitive layer**: button and card primitives keep calculator-specific components focused on behavior.
+- `frontend/coverage/index.html`
+
+## 🧰 Available commands
+
+### Backend
+
+From `backend/`:
+
+```bash
+make build          # compile the backend binary into backend/bin/server
+make run            # run the backend API locally with go run
+make test           # run the backend test suite with the race detector
+make coverage       # generate backend coverage.out and coverage.html
+make lint           # run golangci-lint
+make fmt            # format backend Go code with gofmt
+make generate-docs  # regenerate Swagger files under backend/docs
+```
+
+### Frontend
+
+From `frontend/`:
+
+```bash
+npm run dev            # start the Vite development server
+npm run build          # type-check and build the production frontend bundle
+npm run lint           # run ESLint across the frontend
+npm test               # run the frontend test suite once
+npm run test:watch     # run Vitest in watch mode
+npm run test:coverage  # run tests with coverage and write frontend/coverage
+npm run format         # format frontend files with Prettier
+```
