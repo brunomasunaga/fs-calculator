@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ mode }) => {
   const proxyTarget =
     mode === 'development'
-      ? process.env.VITE_PROXY_TARGET ?? 'http://localhost:8080'
+      ? (process.env.VITE_PROXY_TARGET ?? 'http://localhost:8080')
       : 'http://localhost:8080'
 
   return {

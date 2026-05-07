@@ -70,7 +70,7 @@ The backend follows a small set of rules:
 
 #### 📁 Folder structure
 ```text
-sezzle-calculator/              # root
+fs-calculator/              # root
 ├── backend/
 │   ├── cmd/server/             # backend entrypoint
 │   ├── docs/                   # generated Swagger docs
