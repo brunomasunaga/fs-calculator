@@ -25,8 +25,9 @@ func NewOperationsController(svc service.OperationsService) *OperationsControlle
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/add [post]
 func (oc *OperationsController) Add(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -43,8 +44,9 @@ func (oc *OperationsController) Add(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/subtract [post]
 func (oc *OperationsController) Subtract(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -61,8 +63,9 @@ func (oc *OperationsController) Subtract(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/multiply [post]
 func (oc *OperationsController) Multiply(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -79,8 +82,9 @@ func (oc *OperationsController) Multiply(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/divide [post]
 func (oc *OperationsController) Divide(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -103,8 +107,9 @@ func (oc *OperationsController) Divide(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/power [post]
 func (oc *OperationsController) Power(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -121,8 +126,9 @@ func (oc *OperationsController) Power(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/sqrt [post]
 func (oc *OperationsController) Sqrt(c *gin.Context) {
-	req, ok := bindUnaryRequest(c)
-	if !ok {
+	req, err := bindUnaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
@@ -145,10 +151,15 @@ func (oc *OperationsController) Sqrt(c *gin.Context) {
 // @Failure 400 {object} operations.ErrorResponse
 // @Router /v1/operations/percentage [post]
 func (oc *OperationsController) Percentage(c *gin.Context) {
-	req, ok := bindBinaryRequest(c)
-	if !ok {
+	req, err := bindBinaryRequest(c)
+	if err != nil {
+		writeError(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, CalculateResponse{Result: oc.svc.Percentage(req.OperandA, req.OperandB)})
+}
+
+func writeError(c *gin.Context, err error) {
+	c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 }

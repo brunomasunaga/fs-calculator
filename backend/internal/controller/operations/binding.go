@@ -2,61 +2,49 @@ package operations
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
 
-func bindBinaryRequest(c *gin.Context) (BinaryOperationRequest, bool) {
+func bindBinaryRequest(c *gin.Context) (BinaryOperationRequest, error) {
 	var payload map[string]any
 	var req BinaryOperationRequest
 
 	if err := c.ShouldBindBodyWith(&payload, binding.JSON); err != nil {
-		writeError(c, err)
-		return BinaryOperationRequest{}, false
+		return BinaryOperationRequest{}, err
 	}
 
 	if err := c.ShouldBindBodyWith(&req, binding.JSON); err != nil {
-		writeError(c, err)
-		return BinaryOperationRequest{}, false
+		return BinaryOperationRequest{}, err
 	}
 
 	if _, ok := payload["operand_a"]; !ok {
-		writeError(c, errors.New("operand_a is required"))
-		return BinaryOperationRequest{}, false
+		return BinaryOperationRequest{}, errors.New("operand_a is required")
 	}
 
 	if _, ok := payload["operand_b"]; !ok {
-		writeError(c, errors.New("operand_b is required"))
-		return BinaryOperationRequest{}, false
+		return BinaryOperationRequest{}, errors.New("operand_b is required")
 	}
 
-	return req, true
+	return req, nil
 }
 
-func bindUnaryRequest(c *gin.Context) (UnaryOperationRequest, bool) {
+func bindUnaryRequest(c *gin.Context) (UnaryOperationRequest, error) {
 	var payload map[string]any
 	var req UnaryOperationRequest
 
 	if err := c.ShouldBindBodyWith(&payload, binding.JSON); err != nil {
-		writeError(c, err)
-		return UnaryOperationRequest{}, false
+		return UnaryOperationRequest{}, err
 	}
 
 	if err := c.ShouldBindBodyWith(&req, binding.JSON); err != nil {
-		writeError(c, err)
-		return UnaryOperationRequest{}, false
+		return UnaryOperationRequest{}, err
 	}
 
 	if _, ok := payload["operand"]; !ok {
-		writeError(c, errors.New("operand is required"))
-		return UnaryOperationRequest{}, false
+		return UnaryOperationRequest{}, errors.New("operand is required")
 	}
 
-	return req, true
-}
-
-func writeError(c *gin.Context, err error) {
-	c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+	return req, nil
 }

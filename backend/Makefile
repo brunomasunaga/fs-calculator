@@ -1,6 +1,6 @@
 APP_NAME := fs-calculator-backend
 
-.PHONY: build run test coverage lint fmt generate-docs
+.PHONY: build run test test-verbose coverage lint fmt generate-docs
 
 build:
 	go build -o bin/server ./cmd/server
@@ -9,7 +9,7 @@ run:
 	go run ./cmd/server
 
 test:
-	go test ./... -race
+	CGO_ENABLED=1 go test ./... -race -v
 
 coverage:
 	go test ./... -coverprofile=coverage.out
