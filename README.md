@@ -5,7 +5,7 @@
 
 The repository is split into two applications:
 
-- **Backend**: a Gin-based API that exposes health, docs, and versioned calculator operation endpoints.
+- **Backend**: a Gin-based API that exposes health, docs, and versioned operation endpoints.
 - **Frontend**: a React + Vite single-page application that handles calculator state, user input, and API communication.
 
 Core stack:
@@ -18,15 +18,55 @@ The codebase follows a pragmatic layered design:
 
 - **Presentation layer**:
   - **Concern**: receives HTTP requests, validates payloads, and returns consistent responses.
-  - **Components**: Gin router, calculator controller, health controller, Swagger controller.
+  - **Components**: Gin router, operations controller, health controller, Swagger controller.
 
 - **Service layer**:
-  - **Concern**: applies calculator rules and returns domain-level errors without transport concerns.
-  - **Components**: `CalculatorService`.
+  - **Concern**: applies operation rules and returns domain-level errors without transport concerns.
+  - **Components**: `OperationsService`.
 
 - **Client layer**:
   - **Concern**: renders the calculator UI, manages interaction flow, and calls backend operations.
   - **Components**: React pages, context state, API client helpers.
+
+#### 🏗️ Backend architecture standards
+```text
++-----------------------------+
+| internal/app                |
+| composition root            |
+| wires dependencies          |
++-----------------------------+
+               |
+               v
++-----------------------------+
+| internal/router             |
+| registers routes            |
+| applies middleware          |
++-----------------------------+
+               |
+               v
++-----------------------------+
+| internal/controller/...     |
+| owns HTTP contracts         |
+| validates input             |
+| writes responses            |
++-----------------------------+
+               |
+               v
++-----------------------------+
+| internal/service            |
+| owns business rules         |
+| returns results / errors    |
+| has no transport concerns   |
++-----------------------------+
+```
+
+The backend follows a small set of rules:
+
+- `internal/app` is the composition root. It should wire dependencies together, but not contain request handling or business logic.
+- `internal/router` should define routes and middleware only. It should not implement validation or business rules.
+- `internal/controller/...` should translate between HTTP and the domain: bind requests, validate transport-level input, call services, and write responses.
+- `internal/service` should contain business behavior and domain errors. It should not depend on Gin, HTTP response types, or transport details.
+- Dependency direction should stay one-way: app -> router/controller -> service. Lower layers should not import higher layers.
 
 #### 📁 Folder structure
 ```text
@@ -38,9 +78,9 @@ sezzle-calculator/              # root
 │   │   ├── app/                # composition root / dependency wiring
 │   │   ├── config/             # env-based config loading
 │   │   ├── controller/         # HTTP adapters
-│   │   │   └── calculator/     # calculator handlers and request/response contracts
+│   │   │   └── operations/     # operation handlers and request/response contracts
 │   │   ├── router/             # route registration
-│   │   └── service/            # calculator business logic
+│   │   └── service/            # operation business logic
 │   ├── Dockerfile              # backend dev image
 │   └── Makefile                # backend commands
 ├── frontend/
@@ -62,7 +102,7 @@ sezzle-calculator/              # root
 
 1. Keep the API contract explicit with one endpoint per operation instead of a generic evaluator.
 2. Use manual dependency wiring in Go so construction stays visible and easy to extend.
-3. Keep HTTP contracts close to the calculator controller instead of sharing a generic DTO package.
+3. Keep HTTP contracts close to the operations controller instead of sharing a generic DTO package.
 4. Use a Docker-first workflow so backend and frontend can run with the same entrypoint.
 5. Preserve fast iteration with `air` on the backend and Vite HMR on the frontend.
 6. Cover controller, service, routing, config, and integration paths with automated tests.
