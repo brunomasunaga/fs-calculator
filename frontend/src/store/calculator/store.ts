@@ -40,47 +40,32 @@ type CalculatorStore = CalculatorState & {
   inputDecimal: () => void
 }
 
-let evaluationId = 0
-
 export const useCalculatorStore = create<CalculatorStore>((set, get) => {
   const clearError = () => {
     set({ error: null })
   }
 
-  const cancelPendingEvaluation = () => {
-    evaluationId += 1
+  const applyError = (message: string) => {
+    set({ error: message })
   }
 
   const applyInput = (update: (state: CalculatorState) => CalculatorState) => {
-    cancelPendingEvaluation()
     set((state) => ({
       ...update(state),
       error: null,
     }))
   }
 
-  const runLatestEvaluation = async <T>(
+  const runEvaluation = async <T>(
     evaluate: () => Promise<T>,
     applyResult: (result: T) => void,
   ) => {
-    evaluationId += 1
-    const currentEvaluationId = evaluationId
     clearError()
 
     try {
-      const result = await evaluate()
-
-      if (currentEvaluationId !== evaluationId) {
-        return
-      }
-
-      applyResult(result)
+      applyResult(await evaluate())
     } catch (error) {
-      if (currentEvaluationId !== evaluationId) {
-        return
-      }
-
-      set({ error: getErrorMessage(error) })
+      applyError(getErrorMessage(error))
     }
   }
 
@@ -104,7 +89,6 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => {
 
     // After an error, don't retry the failing computation — reset to the left operand
     if (currentState.error) {
-      cancelPendingEvaluation()
       const leftOperand = currentState.pendingOperation?.leftOperand
       set({
         entry: '',
@@ -123,7 +107,7 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => {
       return
     }
 
-    await runLatestEvaluation(
+    await runEvaluation(
       () =>
         executeBinaryOperation(
           binaryEvaluation.operation,
@@ -175,7 +159,7 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => {
         return
       }
 
-      await runLatestEvaluation(
+      await runEvaluation(
         () =>
           executeBinaryOperation(
             binaryEvaluation.operation,
@@ -207,7 +191,7 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => {
         return
       }
 
-      await runLatestEvaluation(
+      await runEvaluation(
         () => executeUnaryOperation('√', unaryEvaluation.value),
         (result) => {
           set((state) => ({
@@ -258,7 +242,6 @@ export function useCalculatorActions() {
 }
 
 export function resetCalculatorStore() {
-  evaluationId += 1
   useCalculatorStore.setState({
     ...createCalculatorState(),
     error: null,

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import client from '@/services/client'
@@ -55,17 +55,6 @@ function Harness() {
       <button onClick={inputClear}>clear</button>
     </div>
   )
-}
-
-function createDeferred<T>() {
-  let resolve!: (value: T) => void
-  let reject!: (reason?: unknown) => void
-  const promise = new Promise<T>((promiseResolve, promiseReject) => {
-    resolve = promiseResolve
-    reject = promiseReject
-  })
-
-  return { promise, resolve, reject }
 }
 
 function renderHarness() {
@@ -378,48 +367,6 @@ describe('calculator store', () => {
       expect(screen.getByTestId('error')).toHaveTextContent('Result overflow')
     })
     expect(screen.getByTestId('display')).toHaveTextContent('1 + 2')
-  })
-
-  it('ignores stale successful evaluations after newer input', async () => {
-    const evaluation = createDeferred<{ data: { result: number } }>()
-    mockedClient.post.mockReturnValueOnce(evaluation.promise)
-
-    renderHarness()
-
-    fireEvent.click(screen.getByText('digit-1'))
-    fireEvent.click(screen.getByText('add'))
-    fireEvent.click(screen.getByText('digit-2'))
-    fireEvent.click(screen.getByText('equals'))
-    fireEvent.click(screen.getByText('clear'))
-
-    await act(async () => {
-      evaluation.resolve({ data: { result: 3 } })
-      await evaluation.promise
-    })
-
-    expect(screen.getByTestId('display')).toHaveTextContent('0')
-    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('null')
-  })
-
-  it('ignores stale failed evaluations after newer input', async () => {
-    const evaluation = createDeferred<{ data: { result: number } }>()
-    mockedClient.post.mockReturnValueOnce(evaluation.promise)
-
-    renderHarness()
-
-    fireEvent.click(screen.getByText('digit-1'))
-    fireEvent.click(screen.getByText('add'))
-    fireEvent.click(screen.getByText('digit-2'))
-    fireEvent.click(screen.getByText('equals'))
-    fireEvent.click(screen.getByText('clear'))
-
-    await act(async () => {
-      evaluation.reject(new Error('late failure'))
-      await expect(evaluation.promise).rejects.toThrow('late failure')
-    })
-
-    expect(screen.getByTestId('display')).toHaveTextContent('0')
-    expect(screen.getByTestId('error')).toHaveTextContent('null')
   })
 
   it('chains pending binary operations when another operation is selected', async () => {
