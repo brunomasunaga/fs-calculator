@@ -19,6 +19,11 @@ describe('display presentation', () => {
     expect(getDisplayPresentation('123456789012345')).toBe('123456789012345')
   })
 
+  it('returns expressions and scientific notation unchanged', () => {
+    expect(getDisplayPresentation('1 + 2.1234567')).toBe('1 + 2.1234567')
+    expect(getDisplayPresentation('1.234567e+8')).toBe('1.234567e+8')
+  })
+
   it('returns 0 for empty string', () => {
     expect(getDisplayPresentation('')).toBe('0')
   })

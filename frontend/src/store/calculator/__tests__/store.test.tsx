@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import client from '@/services/client'
 import {
   resetCalculatorStore,
   useCalculatorActions,
+  useCalculatorStore,
   useCalculatorView,
 } from '@/store/calculator/store'
 
@@ -27,6 +28,7 @@ function Harness() {
     inputBackspace,
     inputSqrt,
     inputPercentage,
+    inputDecimal,
   } = useCalculatorActions()
 
   return (
@@ -48,10 +50,22 @@ function Harness() {
       <button onClick={() => void inputPercentage()}>percentage</button>
       <button onClick={() => void inputSqrt()}>sqrt</button>
       <button onClick={() => void inputEquals()}>equals</button>
+      <button onClick={inputDecimal}>decimal</button>
       <button onClick={inputBackspace}>backspace</button>
       <button onClick={inputClear}>clear</button>
     </div>
   )
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T) => void
+  let reject!: (reason?: unknown) => void
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve
+    reject = promiseReject
+  })
+
+  return { promise, resolve, reject }
 }
 
 function renderHarness() {
@@ -71,6 +85,17 @@ describe('calculator store', () => {
     fireEvent.click(screen.getByText('digit-2'))
 
     expect(screen.getByTestId('display')).toHaveTextContent('12')
+  })
+
+  it('builds decimal input without duplicating the separator', () => {
+    renderHarness()
+
+    fireEvent.click(screen.getByText('decimal'))
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('decimal'))
+    fireEvent.click(screen.getByText('digit-2'))
+
+    expect(screen.getByTestId('display')).toHaveTextContent('0.12')
   })
 
   it('shows the selected operation in the display', () => {
@@ -284,6 +309,119 @@ describe('calculator store', () => {
     expect(screen.getByTestId('resolved-expression')).toHaveTextContent('null')
   })
 
+  it('normalizes unexpected async failures', async () => {
+    mockedClient.post.mockRejectedValueOnce('boom')
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent('Unexpected error')
+    })
+  })
+
+  it('allows selecting a new operation from the left operand after an error', async () => {
+    mockedClient.post.mockRejectedValueOnce(new Error('division by zero'))
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent('division by zero')
+    })
+
+    fireEvent.click(screen.getByText('multiply'))
+
+    expect(screen.getByTestId('display')).toHaveTextContent('1 ×')
+    expect(screen.getByTestId('error')).toHaveTextContent('null')
+  })
+
+  it('clears standalone error state when selecting a binary operation', () => {
+    useCalculatorStore.setState({
+      entry: '5',
+      pendingOperation: null,
+      resolvedExpression: null,
+      error: 'previous failure',
+    })
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('add'))
+
+    expect(screen.getByTestId('display')).toHaveTextContent('0')
+    expect(screen.getByTestId('error')).toHaveTextContent('null')
+  })
+
+  it('shows overflow errors for non-finite backend results', async () => {
+    mockedClient.post.mockResolvedValueOnce({
+      data: {
+        result: Infinity,
+      },
+    })
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent('Result overflow')
+    })
+    expect(screen.getByTestId('display')).toHaveTextContent('1 + 2')
+  })
+
+  it('ignores stale successful evaluations after newer input', async () => {
+    const evaluation = createDeferred<{ data: { result: number } }>()
+    mockedClient.post.mockReturnValueOnce(evaluation.promise)
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+    fireEvent.click(screen.getByText('clear'))
+
+    await act(async () => {
+      evaluation.resolve({ data: { result: 3 } })
+      await evaluation.promise
+    })
+
+    expect(screen.getByTestId('display')).toHaveTextContent('0')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('null')
+  })
+
+  it('ignores stale failed evaluations after newer input', async () => {
+    const evaluation = createDeferred<{ data: { result: number } }>()
+    mockedClient.post.mockReturnValueOnce(evaluation.promise)
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+    fireEvent.click(screen.getByText('clear'))
+
+    await act(async () => {
+      evaluation.reject(new Error('late failure'))
+      await expect(evaluation.promise).rejects.toThrow('late failure')
+    })
+
+    expect(screen.getByTestId('display')).toHaveTextContent('0')
+    expect(screen.getByTestId('error')).toHaveTextContent('null')
+  })
+
   it('chains pending binary operations when another operation is selected', async () => {
     mockedClient.post.mockResolvedValueOnce({
       data: {
@@ -390,6 +528,25 @@ describe('calculator store', () => {
 
     expect(mockedClient.post).not.toHaveBeenCalled()
     expect(screen.getByTestId('resolved-expression')).toHaveTextContent('null')
+  })
+
+  it('does nothing when equals is pressed without a pending operation', () => {
+    renderHarness()
+
+    fireEvent.click(screen.getByText('equals'))
+
+    expect(mockedClient.post).not.toHaveBeenCalled()
+    expect(screen.getByTestId('display')).toHaveTextContent('0')
+  })
+
+  it('does nothing when sqrt is pressed for an incomplete entry', () => {
+    renderHarness()
+
+    fireEvent.click(screen.getByText('minus'))
+    fireEvent.click(screen.getByText('sqrt'))
+
+    expect(mockedClient.post).not.toHaveBeenCalled()
+    expect(screen.getByTestId('display')).toHaveTextContent('-')
   })
 
   it('clears the resolved expression when the user modifies the result', async () => {
