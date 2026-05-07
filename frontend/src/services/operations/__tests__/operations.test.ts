@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import client from '@/api/client'
+import client from '@/services/client'
 import {
   add,
   divide,
@@ -9,9 +9,9 @@ import {
   power,
   sqrt,
   subtract,
-} from '@/api/operations'
+} from '@/services/operations/operations'
 
-vi.mock('@/api/client', () => ({
+vi.mock('@/services/client', () => ({
   default: {
     post: vi.fn(),
   },
@@ -42,33 +42,52 @@ describe('operations api', () => {
       operand_a: 1,
       operand_b: 2,
     })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(2, '/v1/operations/subtract', {
-      operand_a: 3,
-      operand_b: 2,
-    })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(3, '/v1/operations/multiply', {
-      operand_a: 4,
-      operand_b: 2,
-    })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(4, '/v1/operations/divide', {
-      operand_a: 8,
-      operand_b: 4,
-    })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(5, '/v1/operations/power', {
-      operand_a: 3,
-      operand_b: 2,
-    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      2,
+      '/v1/operations/subtract',
+      {
+        operand_a: 3,
+        operand_b: 2,
+      },
+    )
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      3,
+      '/v1/operations/multiply',
+      {
+        operand_a: 4,
+        operand_b: 2,
+      },
+    )
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      4,
+      '/v1/operations/divide',
+      {
+        operand_a: 8,
+        operand_b: 4,
+      },
+    )
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      5,
+      '/v1/operations/power',
+      {
+        operand_a: 3,
+        operand_b: 2,
+      },
+    )
   })
 
   it('posts unary operations to the expected endpoints', async () => {
-    mockedClient.post
-      .mockResolvedValueOnce({ data: { result: 5 } })
+    mockedClient.post.mockResolvedValueOnce({ data: { result: 5 } })
 
     await expect(sqrt(25)).resolves.toBe(5)
 
-    expect(mockedClient.post).toHaveBeenNthCalledWith(1, '/v1/operations/sqrt', {
-      operand: 25,
-    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      1,
+      '/v1/operations/sqrt',
+      {
+        operand: 25,
+      },
+    )
   })
 
   it('posts percentage as a binary operation', async () => {
@@ -76,10 +95,13 @@ describe('operations api', () => {
 
     await expect(percentage(50, 90)).resolves.toBe(45)
 
-    expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/percentage', {
-      operand_a: 50,
-      operand_b: 90,
-    })
+    expect(mockedClient.post).toHaveBeenCalledWith(
+      '/v1/operations/percentage',
+      {
+        operand_a: 50,
+        operand_b: 90,
+      },
+    )
   })
 
   it('preserves generic errors', async () => {

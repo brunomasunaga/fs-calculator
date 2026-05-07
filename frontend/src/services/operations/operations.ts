@@ -1,9 +1,9 @@
-import client from '@/api/client'
+import client from '@/services/client'
 import {
   type BinaryOperationRequest,
   type OperationResponse,
   type UnaryOperationRequest,
-} from '@/api/operations.contracts'
+} from '@/services/operations/operations.contracts'
 
 export async function add(a: number, b: number): Promise<number> {
   return postBinary('/v1/operations/add', { operand_a: a, operand_b: b })

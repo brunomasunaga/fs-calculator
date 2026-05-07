@@ -1,13 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import client from '@/api/client'
+import client from '@/services/client'
 import {
-  CalculatorProvider,
-  useCalculatorContext,
-} from '@/context/CalculatorContext'
+  resetCalculatorStore,
+  useCalculatorActions,
+  useCalculatorView,
+} from '@/store/calculator/store'
 
-vi.mock('@/api/client', () => ({
+vi.mock('@/services/client', () => ({
   default: {
     post: vi.fn(),
   },
@@ -16,43 +17,50 @@ vi.mock('@/api/client', () => ({
 const mockedClient = vi.mocked(client)
 
 function Harness() {
-  const context = useCalculatorContext()
+  const { display, resolvedExpression, error } = useCalculatorView()
+  const {
+    inputDigit,
+    inputOperation,
+    inputMinus,
+    inputEquals,
+    inputClear,
+    inputBackspace,
+    inputSqrt,
+    inputPercentage,
+  } = useCalculatorActions()
 
   return (
     <div>
-      <output data-testid="display">{context.display}</output>
+      <output data-testid="display">{display}</output>
       <output data-testid="resolved-expression">
-        {context.resolvedExpression ?? 'null'}
+        {resolvedExpression ?? 'null'}
       </output>
-      <output data-testid="error">{context.error ?? 'null'}</output>
+      <output data-testid="error">{error ?? 'null'}</output>
 
-      <button onClick={() => context.inputDigit('1')}>digit-1</button>
-      <button onClick={() => context.inputDigit('2')}>digit-2</button>
-      <button onClick={() => context.inputDigit('3')}>digit-3</button>
-      <button onClick={() => context.inputDigit('8')}>digit-8</button>
-      <button onClick={() => context.inputDigit('9')}>digit-9</button>
-      <button onClick={() => context.inputOperation('+')}>add</button>
-      <button onClick={() => void context.inputMinus()}>minus</button>
-      <button onClick={() => context.inputOperation('×')}>multiply</button>
-      <button onClick={() => void context.inputPercentage()}>percentage</button>
-      <button onClick={() => void context.inputSqrt()}>sqrt</button>
-      <button onClick={() => void context.inputEquals()}>equals</button>
-      <button onClick={() => context.inputBackspace()}>backspace</button>
-      <button onClick={() => context.inputClear()}>clear</button>
+      <button onClick={() => inputDigit('1')}>digit-1</button>
+      <button onClick={() => inputDigit('2')}>digit-2</button>
+      <button onClick={() => inputDigit('3')}>digit-3</button>
+      <button onClick={() => inputDigit('8')}>digit-8</button>
+      <button onClick={() => inputDigit('9')}>digit-9</button>
+      <button onClick={() => void inputOperation('+')}>add</button>
+      <button onClick={() => void inputMinus()}>minus</button>
+      <button onClick={() => void inputOperation('×')}>multiply</button>
+      <button onClick={() => void inputPercentage()}>percentage</button>
+      <button onClick={() => void inputSqrt()}>sqrt</button>
+      <button onClick={() => void inputEquals()}>equals</button>
+      <button onClick={inputBackspace}>backspace</button>
+      <button onClick={inputClear}>clear</button>
     </div>
   )
 }
 
 function renderHarness() {
-  return render(
-    <CalculatorProvider>
-      <Harness />
-    </CalculatorProvider>,
-  )
+  return render(<Harness />)
 }
 
-describe('CalculatorContext', () => {
+describe('calculator store', () => {
   beforeEach(() => {
+    resetCalculatorStore()
     mockedClient.post.mockReset()
   })
 
@@ -111,10 +119,13 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/subtract', {
-        operand_a: 12,
-        operand_b: 23,
-      })
+      expect(mockedClient.post).toHaveBeenCalledWith(
+        '/v1/operations/subtract',
+        {
+          operand_a: 12,
+          operand_b: 23,
+        },
+      )
     })
 
     await waitFor(() => {
@@ -176,10 +187,13 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/subtract', {
-        operand_a: 12,
-        operand_b: 23,
-      })
+      expect(mockedClient.post).toHaveBeenCalledWith(
+        '/v1/operations/subtract',
+        {
+          operand_a: 12,
+          operand_b: 23,
+        },
+      )
     })
 
     await waitFor(() => {
@@ -206,10 +220,13 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/multiply', {
-        operand_a: -18,
-        operand_b: -19,
-      })
+      expect(mockedClient.post).toHaveBeenCalledWith(
+        '/v1/operations/multiply',
+        {
+          operand_a: -18,
+          operand_b: -19,
+        },
+      )
     })
 
     await waitFor(() => {
@@ -244,7 +261,27 @@ describe('CalculatorContext', () => {
       expect(screen.getByTestId('display')).toHaveTextContent('42')
     })
 
-    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('1 + 2 =')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent(
+      '1 + 2 =',
+    )
+  })
+
+  it('shows backend errors and keeps the current expression', async () => {
+    mockedClient.post.mockRejectedValueOnce(new Error('division by zero'))
+
+    renderHarness()
+
+    fireEvent.click(screen.getByText('digit-1'))
+    fireEvent.click(screen.getByText('add'))
+    fireEvent.click(screen.getByText('digit-2'))
+    fireEvent.click(screen.getByText('equals'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error')).toHaveTextContent('division by zero')
+    })
+
+    expect(screen.getByTestId('display')).toHaveTextContent('1 + 2')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('null')
   })
 
   it('chains pending binary operations when another operation is selected', async () => {
@@ -272,7 +309,9 @@ describe('CalculatorContext', () => {
       expect(screen.getByTestId('display')).toHaveTextContent('3 -')
     })
 
-    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('1 + 2 =')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent(
+      '1 + 2 =',
+    )
   })
 
   it('calls the API client for percentage as a binary operation', async () => {
@@ -292,17 +331,22 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(mockedClient.post).toHaveBeenCalledWith('/v1/operations/percentage', {
-        operand_a: 12,
-        operand_b: 12,
-      })
+      expect(mockedClient.post).toHaveBeenCalledWith(
+        '/v1/operations/percentage',
+        {
+          operand_a: 12,
+          operand_b: 12,
+        },
+      )
     })
 
     await waitFor(() => {
       expect(screen.getByTestId('display')).toHaveTextContent('45')
     })
 
-    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('12 % 12 =')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent(
+      '12 % 12 =',
+    )
   })
 
   it('stores the resolved expression for unary operations', async () => {
@@ -328,7 +372,9 @@ describe('CalculatorContext', () => {
       expect(screen.getByTestId('display')).toHaveTextContent('3.46')
     })
 
-    expect(screen.getByTestId('resolved-expression')).toHaveTextContent('√(12) =')
+    expect(screen.getByTestId('resolved-expression')).toHaveTextContent(
+      '√(12) =',
+    )
   })
 
   it('resolves incomplete binary operations locally without calling the API', async () => {
@@ -361,7 +407,9 @@ describe('CalculatorContext', () => {
     fireEvent.click(screen.getByText('equals'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('resolved-expression')).toHaveTextContent('1 + 2 =')
+      expect(screen.getByTestId('resolved-expression')).toHaveTextContent(
+        '1 + 2 =',
+      )
     })
 
     fireEvent.click(screen.getByText('digit-1'))

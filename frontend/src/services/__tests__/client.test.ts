@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
 import { describe, expect, it } from 'vitest'
 
-import { normalizeClientError } from '@/api/client'
+import { normalizeClientError } from '@/services/client'
 
 describe('api client', () => {
   it('normalizes axios api errors', () => {

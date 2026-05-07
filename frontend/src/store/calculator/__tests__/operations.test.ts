@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import client from '@/api/client'
+import client from '@/services/client'
 import {
   executeBinaryOperation,
   executeUnaryOperation,
   formatBinaryResolvedExpression,
   formatUnaryResolvedExpression,
-} from '@/context/calculator-operations'
+} from '@/store/calculator/operations'
 
-vi.mock('@/api/client', () => ({
+vi.mock('@/services/client', () => ({
   default: {
     post: vi.fn(),
   },
@@ -16,7 +16,7 @@ vi.mock('@/api/client', () => ({
 
 const mockedClient = vi.mocked(client)
 
-describe('calculator-operations', () => {
+describe('calculator operations', () => {
   beforeEach(() => {
     mockedClient.post.mockReset()
   })
@@ -33,10 +33,14 @@ describe('calculator-operations', () => {
       operand_a: 1,
       operand_b: 2,
     })
-    expect(mockedClient.post).toHaveBeenNthCalledWith(2, '/v1/operations/percentage', {
-      operand_a: 50,
-      operand_b: 4,
-    })
+    expect(mockedClient.post).toHaveBeenNthCalledWith(
+      2,
+      '/v1/operations/percentage',
+      {
+        operand_a: 50,
+        operand_b: 4,
+      },
+    )
   })
 
   it('routes unary operation symbols to the expected api requests', async () => {

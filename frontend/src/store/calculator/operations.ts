@@ -6,11 +6,14 @@ import {
   power,
   sqrt,
   subtract,
-} from '@/api/operations'
+} from '@/services/operations/operations'
 
 type BinaryOperationDefinition = {
-  execute: (a: number, b: number) => Promise<number>
-  formatResolvedExpression: (lhsText: string, rhsText: string) => string
+  execute: (leftOperand: number, rightOperand: number) => Promise<number>
+  formatResolvedExpression: (
+    leftOperandText: string,
+    rightOperandText: string,
+  ) => string
 }
 
 type UnaryOperationDefinition = {
@@ -21,27 +24,33 @@ type UnaryOperationDefinition = {
 const binaryOperations = {
   '+': {
     execute: add,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} + ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} + ${rightOperandText} =`,
   },
   '-': {
     execute: subtract,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} - ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} - ${rightOperandText} =`,
   },
   '×': {
     execute: multiply,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} × ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} × ${rightOperandText} =`,
   },
   '÷': {
     execute: divide,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} ÷ ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} ÷ ${rightOperandText} =`,
   },
   '^': {
     execute: power,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} ^ ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} ^ ${rightOperandText} =`,
   },
   '%': {
     execute: percentage,
-    formatResolvedExpression: (lhsText, rhsText) => `${lhsText} % ${rhsText} =`,
+    formatResolvedExpression: (leftOperandText, rightOperandText) =>
+      `${leftOperandText} % ${rightOperandText} =`,
   },
 } as const satisfies Record<string, BinaryOperationDefinition>
 
@@ -57,18 +66,21 @@ export type UnaryOperationSymbol = keyof typeof unaryOperations
 
 export function executeBinaryOperation(
   operation: BinaryOperationSymbol,
-  lhs: number,
-  rhs: number,
+  leftOperand: number,
+  rightOperand: number,
 ) {
-  return binaryOperations[operation].execute(lhs, rhs)
+  return binaryOperations[operation].execute(leftOperand, rightOperand)
 }
 
 export function formatBinaryResolvedExpression(
   operation: BinaryOperationSymbol,
-  lhsText: string,
-  rhsText: string,
+  leftOperandText: string,
+  rightOperandText: string,
 ) {
-  return binaryOperations[operation].formatResolvedExpression(lhsText, rhsText)
+  return binaryOperations[operation].formatResolvedExpression(
+    leftOperandText,
+    rightOperandText,
+  )
 }
 
 export function executeUnaryOperation(
